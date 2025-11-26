@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Climate Futures Explorer – Prototype</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- D3.js -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Climate Futures Explorer</h1>
+    <p>DSC 106 Final Project – Initial Prototype</p>
+  </header>
+
+  <main>
+    <!-- Intro / Overview -->
+    <section id="intro">
+      <h2>Project Overview</h2>
+      <p>
+        This prototype explores how projected changes in global temperature and precipitation
+        under different CMIP6 scenarios may shape future climate patterns and global vegetation.
+        Users can compare emission pathways and regional outcomes using the controls below.
+      </p>
+      <p>
+        The current version focuses on two core time series visualizations. Future iterations
+        will add narrative annotations, maps, and explicit links to vegetation/biome changes.
+      </p>
+    </section>
+
+    <!-- Controls -->
+    <section id="controls">
+      <h2>Explore Scenarios and Regions</h2>
+      <div class="control-row">
+        <div class="control-group">
+          <label for="scenario-select">Scenario:</label>
+          <select id="scenario-select"></select>
+        </div>
+
+        <div class="control-group">
+          <label for="region-select">Region:</label>
+          <select id="region-select"></select>
+        </div>
+      </div>
+      <p class="control-help">
+        Use the dropdowns to choose a CMIP6 scenario and world region. Both charts below will
+        update to reflect your selection.
+      </p>
+    </section>
+
+    <!-- Visualizations -->
+    <section id="viz-temp" class="viz-section">
+      <h2>Projected Temperature Change</h2>
+      <p>
+        This chart shows projected near-surface air temperature (°C) for the selected scenario
+        and region from 1850 to 2100 (where available). Higher-emissions scenarios typically
+        lead to steeper warming.
+      </p>
+      <div id="temp-chart" class="chart-container"></div>
+    </section>
+
+    <section id="viz-precip" class="viz-section">
+      <h2>Projected Precipitation Change</h2>
+      <p>
+        This chart shows projected daily precipitation (mm/day) for the same scenario and region.
+        Changes in rainfall patterns can contribute to vegetation greening, browning, or biome shifts.
+      </p>
+      <div id="precip-chart" class="chart-container"></div>
+    </section>
+
+    <!-- Future Narrative Placeholder -->
+    <section id="narrative">
+      <h2>Planned Narrative Structure</h2>
+      <p>
+        In the final project, we will extend this prototype into a full explorable explanation that:
+      </p>
+      <ul>
+        <li>Introduces global temperature trajectories across CMIP6 emission pathways.</li>
+        <li>Highlights regional contrasts in temperature and precipitation change.</li>
+        <li>Connects climate projections to potential vegetation responses and biome transitions.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer>
+    <p>Prototype v0.1 – DSC 106 Fall 2025</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
