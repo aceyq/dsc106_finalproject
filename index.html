@@ -7,6 +7,7 @@
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
 </head>
+
 <body>
   <header>
     <h1>Climate Futures Explorer</h1>
@@ -14,6 +15,7 @@
   </header>
 
   <main>
+
     <!-- Intro / Overview -->
     <section id="intro">
       <h2>Project Overview</h2>
@@ -24,7 +26,50 @@
       </p>
       <p>
         The current version focuses on two core time series visualizations. Future iterations
-        will add narrative annotations, maps, and explicit links to vegetation/biome changes.
+        will add narrative annotations, maps, and explicit links to vegetation and biome changes.
+      </p>
+    </section>
+
+    <!-- WRITEUP SECTION REQUIRED BY THE ASSIGNMENT -->
+    <section id="writeup">
+      <h2>Project Write-Up</h2>
+
+      <h3>1. What have you done so far?</h3>
+      <p>
+        So far, we have built the core structure of the Climate Futures Explorer prototype, including
+        the user interface, dropdown controls, and two main D3 time-series visualizations. We have
+        connected the charts to scenario and region selectors so that the user can dynamically
+        explore differences in future climate projections. We also integrated processed temperature
+        and precipitation datasets from the CMIP6 archive and ensured they load efficiently through
+        JavaScript. Additionally, we created a cohesive design system with consistent styling,
+        padded card components, and a dark background theme to increase readability and focus.
+      </p>
+      <p>
+        Beyond the visuals, we have outlined the narrative flow that the final project will follow,
+        including how temperature trends, precipitation shifts, and ecological responses will be
+        introduced in a step-by-step story. We set up the structure for adding future annotations
+        and explanations to guide users toward important insights. Overall, the prototype now
+        includes all foundational elements needed for the explorable explanation we plan to build.
+      </p>
+
+      <h3>2. What will be the most challenging part of the project and why?</h3>
+      <p>
+        The most challenging part of the project will be designing an integrated narrative that
+        smoothly connects the climate variables to ecological outcomes while keeping the interface
+        intuitive and uncluttered. Climate data is inherently complex, and adding meaningful
+        explanations without overwhelming users requires careful information design. Another major
+        difficulty will be integrating spatial data, such as maps or vegetation classifications,
+        into the existing time-series framework. Ensuring that the visual transitions feel coherent
+        and that users understand how each chart relates to the evolving story will take significant
+        iteration.
+      </p>
+      <p>
+        We also anticipate challenges in balancing interactivity with interpretability. As we add
+        more layers—scenarios, regions, biome indicators, and narrative steps—it becomes harder to
+        maintain visual clarity and avoid cognitive overload. Developing a layout that supports
+        multiple linked views while remaining visually clean will require thoughtful prototyping
+        and user-first design decisions. Ultimately, the biggest challenge is not technical, but
+        ensuring the final narrative remains compelling, accessible, and scientifically accurate.
       </p>
     </section>
 
@@ -48,7 +93,7 @@
       </p>
     </section>
 
-    <!-- Visualizations -->
+    <!-- Temperature Viz -->
     <section id="viz-temp" class="viz-section">
       <h2>Projected Temperature Change</h2>
       <p>
@@ -59,6 +104,7 @@
       <div id="temp-chart" class="chart-container"></div>
     </section>
 
+    <!-- Precip Viz -->
     <section id="viz-precip" class="viz-section">
       <h2>Projected Precipitation Change</h2>
       <p>
@@ -80,6 +126,7 @@
         <li>Connects climate projections to potential vegetation responses and biome transitions.</li>
       </ul>
     </section>
+
   </main>
 
   <footer>
