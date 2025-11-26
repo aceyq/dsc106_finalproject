@@ -1,1 +1,3 @@
-# dsc106_finalproject
+# DSC106 Final Project
+
+Our project explores how projected changes in global temperature and precipitation under different CMIP6 climate scenarios may shape future environmental and ecological conditions. By integrating long-term climate projections with intuitive interactive visuals, the project allows users to examine how various emission pathways diverge over time and how shifts in climate variables may influence global vegetation patterns. Through scenario comparisons, time-series explorations, and planned additions such as spatial maps and vegetation overlays, our project aims to translate complex climate model outputs into an accessible and visually engaging explorable explanation that highlights the relationships between human-driven emissions, evolving climate trajectories, and the ecosystems affected by these changes.
