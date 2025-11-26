@@ -1,5 +1,3 @@
-// script.js
-
 // Global variables to store data
 let tempDataRaw = [];
 let precipDataRaw = [];
@@ -9,10 +7,10 @@ const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
 // Dimensions for charts
 const chartConfig = {
-  width: 800,
-  height: 380,
-  margin: { top: 40, right: 20, bottom: 50, left: 70 }
-};
+    width: 720,
+    height: 320,
+    margin: { top: 40, right: 20, bottom: 50, left: 70 }
+  };
 
 // Create a single tooltip div (shared by both charts)
 const tooltip = d3.select("body")
