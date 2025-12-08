@@ -192,7 +192,7 @@ const yScale = d3.scaleLinear()
     .tickFormat(d3.timeFormat("%Y"));
 
   const yAxis = d3.axisLeft(yScale)
-    .ticks(5);
+    .ticks(3);
 
   svg.append("g")
     .attr("class", "axis x-axis")
