@@ -5,7 +5,7 @@ let tempGlobalMin, tempGlobalMax;
 let precipGlobalMin, precipGlobalMax;
 
 const tempFixedY = [4, 10]; // adjust based on your data
-const precipFixedY = [2, 3]; // adjust to your max values
+const precipFixedY = [2.3, 2.6]; // adjust to your max values
 
 // Date parser for "YYYY-MM-DD HH:MM:SS"
 const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
