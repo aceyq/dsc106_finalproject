@@ -1,6 +1,8 @@
 // Global variables to store data
 let tempDataRaw = [];
 let precipDataRaw = [];
+let tempGlobalMin, tempGlobalMax;
+let precipGlobalMin, precipGlobalMax;
 
 // Date parser for "YYYY-MM-DD HH:MM:SS"
 const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
@@ -47,6 +49,11 @@ Promise.all([
 ]).then(([temp, precip]) => {
   tempDataRaw = temp;
   precipDataRaw = precip;
+
+  tempGlobalMin = d3.min(tempDataRaw, d => d.tas_C);
+  tempGlobalMax = d3.max(tempDataRaw, d => d.tas_C);
+  precipGlobalMin = d3.min(precipDataRaw, d => d.pr_day);
+  precipGlobalMax = d3.max(precipDataRaw, d => d.pr_day);
 
   initializeControls();
   updateCharts(); // draw initial charts
@@ -112,7 +119,8 @@ function updateCharts() {
     data: tempFiltered,
     yAccessor: d => d.tas_C,
     yLabel: "Temperature (°C)",
-    title: `Temperature – ${scenarioLabel(scenario)}, ${region}`
+    title: `Temperature – ${scenarioLabel(scenario)}, ${region}`,
+    fixedYDomain: [tempGlobalMin, tempGlobalMax]
   });
 
   drawLineChart({
@@ -120,12 +128,13 @@ function updateCharts() {
     data: precipFiltered,
     yAccessor: d => d.pr_day,
     yLabel: "Precipitation (mm/day)",
-    title: `Precipitation – ${scenarioLabel(scenario)}, ${region}`
+    title: `Precipitation – ${scenarioLabel(scenario)}, ${region}`,
+    fixedYDomain: [precipGlobalMin, precipGlobalMax]
   });
 }
 
 // Generic line chart drawing function using D3
-function drawLineChart({ container, data, yAccessor, yLabel, title }) {
+function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain}) {
   // Clear any existing SVG
   const containerSel = d3.select(container);
   containerSel.selectAll("*").remove();
@@ -149,17 +158,33 @@ function drawLineChart({ container, data, yAccessor, yLabel, title }) {
 
   // Scales
   const xExtent = d3.extent(data, d => d.time);
-  const yExtent = d3.extent(data, yAccessor);
+  // const yExtent = d3.extent(data, yAccessor);
 
   const xScale = d3.scaleTime()
     .domain(xExtent)
     .range([margin.left, width - margin.right]);
 
-  const yPadding = (yExtent[1] - yExtent[0]) * 0.1 || 1;
-  const yScale = d3.scaleLinear()
-    .domain([yExtent[0] - yPadding, yExtent[1] + yPadding])
-    .nice()
-    .range([height - margin.bottom, margin.top]);
+  //const yPadding = (yExtent[1] - yExtent[0]) * 0.1 || 1;
+  // const yScale = d3.scaleLinear()
+    //.domain([yExtent[0] - yPadding, yExtent[1] + yPadding])
+    //.nice()
+    //.range([height - margin.bottom, margin.top]);
+
+  let yMin, yMax;
+
+  if (fixedYDomain) {
+    // Use global range
+    yMin = fixedYDomain[0];
+    yMax = fixedYDomain[1];
+  } else {
+    // fallback (should not happen for your project)
+    const yExtent = d3.extent(data, yAccessor);
+    yMin = yExtent[0];
+    yMax = yExtent[1];
+  }
+const yScale = d3.scaleLinear()
+  .domain([yMin, yMax])
+  .range([height - margin.bottom, margin.top]);
 
   // Axes
   const xAxis = d3.axisBottom(xScale)
