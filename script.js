@@ -4,8 +4,8 @@ let precipDataRaw = [];
 let tempGlobalMin, tempGlobalMax;
 let precipGlobalMin, precipGlobalMax;
 
-const tempFixedY = [0, 10]; // adjust based on your data
-const precipFixedY = [0, 3]; // adjust to your max values
+const tempFixedY = [4, 10]; // adjust based on your data
+const precipFixedY = [2, 3]; // adjust to your max values
 
 // Date parser for "YYYY-MM-DD HH:MM:SS"
 const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
