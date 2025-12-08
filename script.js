@@ -4,6 +4,9 @@ let precipDataRaw = [];
 let tempGlobalMin, tempGlobalMax;
 let precipGlobalMin, precipGlobalMax;
 
+const tempFixedY = [0, 10]; // adjust based on your data
+const precipFixedY = [0, 5]; // adjust to your max values
+
 // Date parser for "YYYY-MM-DD HH:MM:SS"
 const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
@@ -120,7 +123,7 @@ function updateCharts() {
     yAccessor: d => d.tas_C,
     yLabel: "Temperature (°C)",
     title: `Temperature – ${scenarioLabel(scenario)}, ${region}`,
-    fixedYDomain: [tempGlobalMin, tempGlobalMax]
+    fixedYDomain: tempFixedY
   });
 
   drawLineChart({
@@ -129,7 +132,7 @@ function updateCharts() {
     yAccessor: d => d.pr_day,
     yLabel: "Precipitation (mm/day)",
     title: `Precipitation – ${scenarioLabel(scenario)}, ${region}`,
-    fixedYDomain: [precipGlobalMin, precipGlobalMax]
+    fixedYDomain: precipFixedY
   });
 }
 
@@ -182,9 +185,9 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     yMin = yExtent[0];
     yMax = yExtent[1];
   }
-const yScale = d3.scaleLinear()
-  .domain([yMin, yMax])
-  .range([height - margin.bottom, margin.top]);
+  const yScale = d3.scaleLinear()
+    .domain([yMin, yMax])
+    .range([height - margin.bottom, margin.top]);
 
   // Axes
   const xAxis = d3.axisBottom(xScale)
@@ -192,7 +195,7 @@ const yScale = d3.scaleLinear()
     .tickFormat(d3.timeFormat("%Y"));
 
   const yAxis = d3.axisLeft(yScale)
-    .ticks(3);
+    .ticks(5);
 
   svg.append("g")
     .attr("class", "axis x-axis")
