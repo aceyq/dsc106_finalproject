@@ -6,104 +6,142 @@
   <link rel="stylesheet" href="style.css" />
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- TopoJSON for world map -->
+  <script src="https://unpkg.com/topojson-client@3"></script>
   <!-- Scrollama for scrollytelling -->
   <script src="https://unpkg.com/scrollama"></script>
 </head>
 
-<body>
+<body class="scn-ssp245">
   <header>
-    <div class="header-inner">
-      <div class="brand">
-        <h1>Climate Futures Explorer</h1>
-        <p>DSC 106 Final Project – Initial Prototype</p>
-      </div>
-      <nav class="top-tabs">
-        <button class="tab-button active" data-tab="explorer">Interactive Explorer</button>
-        <button class="tab-button" data-tab="writeup">Design &amp; Reflection</button>
-      </nav>
-    </div>
+    <h1>Climate Futures Explorer</h1>
+    <p>DSC 106 Final Project – Interactive Prototype</p>
   </header>
 
   <main>
-    <!-- ================ TAB: INTERACTIVE EXPLORER ================ -->
-    <section id="tab-explorer" class="tab-panel active">
 
-      <div class="layout-two-col">
-        <!-- LEFT: STORY / SCROLLY -->
-        <section id="story-column">
-          <h2>Following the Branching Paths of the Future</h2>
-          <p>
-            The same planet can end up in very different places. On the left, each story card introduces
-            one CMIP6 emissions pathway. On the right, the map and charts respond: temperatures bend upward,
-            rainfall patterns shift, and some regions diverge sharply from the global average. All of these
-            futures start from the same world. But they fan out depending on our choices.
-          </p>
-          <p>
-            This explorer is built to help you compare those paths side-by-side, region by region.
-            Scroll through the scenarios, then use the map and controls on the right to see how each
-            pathway plays out in different parts of the world.
-          </p>
+    <!-- Intro / Overview -->
+    <section id="intro">
+      <h2>Why We Built This Explorer</h2>
+      <p>
+        Climate projections often live in dense reports and static figures. Our goal with the
+        Climate Futures Explorer is to turn those projections into something you can actually play with:
+        a space where you can move between regions, switch between emission pathways, and feel how the
+        shape of the future changes.
+      </p>
+      <p>
+        This prototype focuses on two core climate variables—near-surface air temperature and daily
+        precipitation—from CMIP6 scenarios. By connecting a world map, scenario story beats, and linked
+        time-series charts, we want to make it easier to see how “global warming” splits into many
+        different regional futures.
+      </p>
+    </section>
 
-          <div id="scenario-steps">
-            <article class="scenario-step is-active" data-scenario="ssp126">
-              <h3>SSP1-2.6 – A world that pulls back</h3>
-              <p>
-                In SSP1-2.6, strong climate policy and rapid decarbonization keep warming comparatively
-                shallow. Ecosystems still face stress, but changes unfold more slowly, giving forests,
-                crops, and cities more time to adapt before major biome shifts lock in.
-              </p>
-            </article>
+    <!-- Tabs: Explorer vs Write-Up -->
+    <div id="tab-bar">
+      <button class="tab-btn active" data-tab="explorer">Interactive Explorer</button>
+      <button class="tab-btn" data-tab="writeup">Design & Reflection</button>
+    </div>
 
-            <article class="scenario-step" data-scenario="ssp245">
-              <h3>SSP2-4.5 – A “middle-of-the-road” future</h3>
-              <p>
-                SSP2-4.5 sits close to our current trajectory. Warming accelerates after mid-century,
-                and precipitation shifts become more noticeable—heavier downpours in some regions and
-                drying in others. Risks for crops, water systems, and fire-prone landscapes start to
-                feel less like “rare events” and more like a new normal.
-              </p>
-            </article>
+    <!-- ================== EXPLORER TAB ================== -->
+    <section id="explorer" class="tab-panel active">
 
-            <article class="scenario-step" data-scenario="ssp370">
-              <h3>SSP3-7.0 – Fragmented action, higher risks</h3>
-              <p>
-                In SSP3-7.0, global cooperation stalls. Temperatures climb more steeply, and rainfall
-                patterns become more volatile. Some regions face repeated droughts while others see
-                heavier storms, increasing the chance of vegetation stress, crop failures, and abrupt
-                biome disruption.
-              </p>
-            </article>
-
-            <article class="scenario-step" data-scenario="ssp585">
-              <h3>SSP5-8.5 – The fossil-fuel intensive benchmark</h3>
-              <p>
-                SSP5-8.5 imagines a fossil-fuel heavy world and serves as a “worst-case” benchmark.
-                Warming is fast and large, and the climate system has far less time to settle into
-                new patterns. In this future, ecosystems are pushed hardest: large-scale biome
-                transitions become much more likely, and adaptation has to race to catch up.
-              </p>
-            </article>
+      <!-- SCROLLYTELLING: story on left, map + charts on right -->
+      <section id="scrolly-1">
+        <!-- Story / narrative column -->
+        <div id="scrolly-text">
+          <!-- Progress bar for story -->
+          <div id="scroll-progress">
+            <div id="scroll-progress-inner"></div>
           </div>
-        </section>
 
-        <!-- RIGHT: MAP + CONTROLS + CHARTS -->
-        <section id="data-column">
-          <!-- Map + region controls -->
-          <section id="region-panel" class="card">
-            <div class="card-header-row">
-              <div>
-                <h2>Choose a Region, Compare Pathways</h2>
-                <p class="eyebrow">Current region:</p>
-                <p class="current-region-label" id="current-region-label">Global</p>
-              </div>
-              <div class="region-control-group">
-                <label for="region-select">Region</label>
+          <h2>Following the Branching Paths of the Future</h2>
+          <p class="scrolly-intro">
+            The same planet can end up in very different places. On the left, each story beat introduces
+            one CMIP6 emissions pathway. On the right, the map and charts respond: temperatures bend upward,
+            rainfall patterns shift, and some regions diverge sharply from the global average.
+            <strong>And</strong> all of these futures start from the same world.
+            <strong>But</strong> they fan out depending on our choices.
+            <strong>Therefore</strong>, this explorer is built to help you compare those paths side-by-side,
+            region by region.
+          </p>
+
+          <div class="step is-active" data-scenario="ssp126">
+            <h3>SSP1-2.6 – A world that pulls back</h3>
+            <p>
+              In SSP1-2.6, strong climate policy and rapid decarbonization keep warming comparatively shallow.
+              Ecosystems still face stress, but changes unfold more slowly, giving forests, crops, and cities
+              more time to adapt before major biome shifts lock in.
+            </p>
+          </div>
+
+          <div class="step" data-scenario="ssp245">
+            <h3>SSP2-4.5 – A “middle-of-the-road” future</h3>
+            <p>
+              SSP2-4.5 sits close to our current trajectory. Warming accelerates after mid-century, and
+              precipitation shifts become more noticeable—heavier downpours in some regions and drying in others.
+              Risks for crops, water systems, and fire-prone landscapes start to feel less like “rare events”
+              and more like a new normal.
+            </p>
+          </div>
+
+          <div class="step" data-scenario="ssp370">
+            <h3>SSP3-7.0 – Fragmented action, higher risks</h3>
+            <p>
+              In SSP3-7.0, global cooperation stalls. Temperatures climb more steeply, and rainfall becomes
+              more volatile. Some regions face repeated droughts while others see heavier storms, increasing
+              the chance of vegetation stress, crop failures, and abrupt biome disruption.
+            </p>
+          </div>
+
+          <div class="step" data-scenario="ssp585">
+            <h3>SSP5-8.5 – The fossil-fuel intensive benchmark</h3>
+            <p>
+              SSP5-8.5 imagines a fossil-fuel heavy world and serves as a “worst-case” benchmark. Warming is
+              fast and large, and the climate system has far less time to settle into new patterns. In this
+              future, ecosystems are pushed hardest: large-scale biome transitions become much more likely,
+              and adaptation has to race to catch up.
+            </p>
+          </div>
+        </div>
+
+        <!-- Visualization column: map + controls + charts -->
+        <div id="scrolly-viz">
+
+          <!-- Scenario insight strip (updated when scenario/region change) -->
+          <div id="scenario-insight" class="scenario-insight">
+            <strong>SSP2-4.5 in Global:</strong>
+            A middle-of-the-road future—warming is significant but not the worst case, leaving a shrinking window for adaptation.
+          </div>
+
+          <!-- Region Map -->
+          <section id="map-section" class="viz-section">
+            <h2>Locating These Futures on the Map</h2>
+            <p>
+              Climate change is never just a line on a chart—it’s a pattern on a map. Click a highlighted region
+              or use the dropdown below to focus on a part of the world. The temperature and precipitation charts
+              update to show how that region’s story compares to the global picture.
+            </p>
+            <div id="region-map" class="map-container"></div>
+            <div id="region-summary" class="region-summary-card">
+              <h3>Global snapshot</h3>
+              <p>
+                Under SSP2-4.5, global temperatures climb steadily from pre-industrial levels to the end of the
+                century. Use the controls below to see which regions warm faster or slower than the planet as a whole,
+                and how their rainfall patterns drift away from “normal.”
+              </p>
+            </div>
+          </section>
+
+          <!-- Controls -->
+          <section id="controls">
+            <h2>Choose a Region, Compare Pathways</h2>
+            <div class="control-row">
+              <div class="control-group">
+                <label for="region-select">Region:</label>
                 <select id="region-select"></select>
               </div>
-            </div>
 
-            <div class="scenario-pill-row">
-              <span class="pill-label">Pathways:</span>
               <div class="scenario-pills" id="scenario-pills">
                 <button class="pill active" data-scn="ssp126">SSP1-2.6</button>
                 <button class="pill active" data-scn="ssp245">SSP2-4.5</button>
@@ -111,201 +149,113 @@
                 <button class="pill active" data-scn="ssp585">SSP5-8.5</button>
               </div>
             </div>
-
             <p class="control-help">
               Use the map or dropdown to pick a region. Toggle the scenario buttons to show one pathway at a time
               or compare several. When you scroll through the story cards on the left, the explorer briefly zooms
               in on a single pathway, then hands control back to you.
             </p>
-
-            <!-- 2D world map region selector -->
-            <div class="world-map-shell">
-              <svg id="region-map-svg" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
-                <defs>
-                  <linearGradient id="mapBg" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stop-color="#0b1220" />
-                    <stop offset="40%" stop-color="#020617" />
-                    <stop offset="100%" stop-color="#020617" />
-                  </linearGradient>
-                </defs>
-
-                <rect class="map-ocean" x="0" y="0" width="800" height="400" fill="url(#mapBg)" rx="26" />
-
-                <!-- simple “graticule” grid -->
-                <g class="map-graticule" stroke="#1f2937" stroke-width="0.6">
-                  <!-- verticals -->
-                  <line x1="100" y1="40" x2="100" y2="360" />
-                  <line x1="250" y1="40" x2="250" y2="360" />
-                  <line x1="400" y1="40" x2="400" y2="360" />
-                  <line x1="550" y1="40" x2="550" y2="360" />
-                  <line x1="700" y1="40" x2="700" y2="360" />
-                  <!-- horizontals -->
-                  <line x1="60" y1="90" x2="740" y2="90" />
-                  <line x1="60" y1="170" x2="740" y2="170" />
-                  <line x1="60" y1="250" x2="740" y2="250" />
-                  <line x1="60" y1="330" x2="740" y2="330" />
-                </g>
-
-                <g class="map-dots"></g>
-              </svg>
-            </div>
-
-            <p class="map-help">
-              Click a dot to jump to a region. The region selector stays in sync so you can also adjust it manually.
-            </p>
           </section>
 
-          <!-- Charts: temp + precip side-by-side on wide screens -->
-          <section id="charts-panel" class="card">
-            <h2>How Warm Does It Get? / How Rainfall Patterns Shift</h2>
+          <!-- Temperature Viz -->
+          <section id="viz-temp" class="viz-section">
+            <h2>How Warm Does It Get?</h2>
             <p>
-              The two charts below show projected near-surface air temperature (°C) and daily precipitation (mm/day)
-              for the selected region under each emissions pathway. Higher-emissions scenarios produce steeper curves:
-              the same starting point, but very different destinations.
+              This chart shows projected near-surface air temperature (°C) for the selected scenario(s) and region
+              from 1850 to 2100 (where available). Higher-emissions scenarios produce steeper curves: the same
+              starting point, but very different destinations.
             </p>
-
-            <div class="chart-grid">
-              <div class="chart-card">
-                <div class="chart-card-header">
-                  <h3>Temperature</h3>
-                  <div id="temp-chart-legend" class="legend"></div>
-                </div>
-                <div id="temp-chart" class="chart-container"></div>
-              </div>
-
-              <div class="chart-card">
-                <div class="chart-card-header">
-                  <h3>Precipitation</h3>
-                  <div id="precip-chart-legend" class="legend"></div>
-                </div>
-                <div id="precip-chart" class="chart-container"></div>
-              </div>
+            <div class="chart-header">
+              <div id="temp-chart-legend" class="legend"></div>
             </div>
+            <div id="temp-chart" class="chart-container"></div>
           </section>
 
-          <!-- Impact snapshot -->
-          <section id="impact-panel" class="card">
-            <h2>What Does This Add Up To?</h2>
+          <!-- Precip Viz -->
+          <section id="viz-precip" class="viz-section">
+            <h2>How Rainfall Patterns Shift</h2>
             <p>
-              For the highlighted pathway, we compare the beginning and end of the time series in this region.
-              These numbers are approximate, but they give a sense of how much the local climate shifts over a
-              human lifetime.
+              This chart shows projected daily precipitation (mm/day) for the same scenario(s) and region.
+              In some places, climate change shows up as heavier downpours; in others, as subtle drying.
+              These shifts can drive vegetation greening, browning, or transitions into entirely new biomes.
             </p>
-
-            <div class="impact-grid">
-              <article class="impact-card">
-                <header>
-                  <p class="impact-label">Warming by 2100</p>
-                  <p class="impact-value"><span id="temp-delta">–</span> °C</p>
-                </header>
-                <p class="impact-body" id="impact-temp-text">
-                  Loading temperature change…
-                </p>
-                <div class="impact-bar">
-                  <div class="impact-bar-fill" id="temp-bar-fill"></div>
-                </div>
-                <p class="impact-footnote">
-                  Highlighted pathway:
-                  <span id="impact-scenario-label">–</span>
-                </p>
-              </article>
-
-              <article class="impact-card">
-                <header>
-                  <p class="impact-label">Change in Daily Rainfall</p>
-                  <p class="impact-value"><span id="precip-delta">–</span>%</p>
-                </header>
-                <p class="impact-body" id="impact-precip-text">
-                  Loading precipitation change…
-                </p>
-                <div class="impact-bar">
-                  <div class="impact-bar-fill" id="precip-bar-fill"></div>
-                </div>
-                <p class="impact-footnote">
-                  Positive values indicate wetter conditions on average; negative values indicate drying.
-                </p>
-              </article>
+            <div class="chart-header">
+              <div id="precip-chart-legend" class="legend"></div>
             </div>
-
-            <p class="small-note">
-              Note: Values are rough differences between the earliest and latest years available in the data
-              for the selected region and scenario. They are meant for intuition, not precise forecasting.
-            </p>
+            <div id="precip-chart" class="chart-container"></div>
           </section>
 
-        </section>
-      </div>
-    </section>
+          <!-- Planned narrative / future structure -->
+          <section id="narrative">
+            <h2>Where We Want to Take This Next</h2>
+            <p>
+              This prototype is a first pass at an “explorable explanation” of climate futures. As we iterate, we plan to:
+            </p>
+            <ul>
+              <li>Layer in more detailed uncertainty views (model spreads and ranges, not just single lines).</li>
+              <li>Highlight regional contrasts more explicitly with annotations and callouts.</li>
+              <li>Connect climate projections to potential vegetation responses and biome transitions.</li>
+              <li>Refine the scrollytelling so each step lands with a clear, memorable takeaway.</li>
+            </ul>
+          </section>
 
-    <!-- ================ TAB: DESIGN & REFLECTION ================ -->
-    <section id="tab-writeup" class="tab-panel">
-      <section id="writeup" class="card">
-        <h2>Design &amp; Reflection</h2>
-
-        <h3>What We’ve Built So Far</h3>
-        <p>
-          This prototype is the first pass at an “explorable explanation” of climate futures. We built the core
-          structure of the Climate Futures Explorer, including the scenario story cards on the left, the region
-          selector, and two linked D3 line charts for temperature and precipitation on the right.
-        </p>
-        <p>
-          The charts are wired to a shared set of controls so that when a user changes the region, both plots
-          update together. When the user toggles different CMIP6 pathways, the visual encodings stay consistent:
-          each scenario keeps the same color across charts and legends. We process CMIP6-based summary data for
-          temperature and precipitation and load it via JavaScript so that future climate variables or vegetation
-          indicators can be added with minimal changes to the code.
-        </p>
-        <p>
-          Beyond the basic visuals, we also implemented a small scrollytelling sequence. As the viewer scrolls
-          through each scenario card on the left, the right-hand visuals temporarily focus on that pathway,
-          helping the reader connect the narrative language (“rapid mitigation”, “fragmented action”) to concrete
-          trajectories in the data.
-        </p>
-
-        <h3>What’s Been Hard (and Why)</h3>
-        <p>
-          The biggest challenge has been balancing interactivity with clarity. It is tempting to add sliders,
-          animations, and toggles everywhere, but each new control makes it harder for viewers to know
-          where to look. We experimented with multiple layouts before settling on the current two-column design,
-          where the story and the data are always visible at the same time.
-        </p>
-        <p>
-          Integrating spatial thinking was also tricky. We wanted a way to highlight that climate change does
-          not unfold uniformly, without building a full choropleth map. The compromise is a stylized “mini-world”
-          with a small set of clickable dots tied to regions in the dataset. This approach keeps the focus on
-          the time series while still giving the reader a mental map of where they are.
-        </p>
-        <p>
-          Finally, summarizing the impacts in an honest but approachable way is non-trivial. We chose to show
-          simple beginning-to-end differences in temperature and precipitation for a highlighted pathway, and we
-          explicitly label them as approximations rather than forecasts.
-        </p>
-
-        <h3>Where We Want to Take This Next</h3>
-        <p>
-          Looking ahead, there are several directions we’d like to pursue:
-        </p>
-        <ul>
-          <li>
-            Layer in more detailed uncertainty views (model spreads and ranges, not just single lines) to
-            emphasize that these are projections, not guarantees.
-          </li>
-          <li>
-            Draw more explicit lines between regional climate shifts and potential vegetation responses—for
-            example, highlighting where biome transitions or fire regimes are likely to change.
-          </li>
-          <li>
-            Refine the scrollytelling so that each step ends with a clear, memorable takeaway, and experiment
-            with more “impact visualization” moments that help the reader feel the difference between pathways
-            (not just see it numerically).
-          </li>
-        </ul>
+        </div>
       </section>
     </section>
+
+    <!-- ================== WRITE-UP TAB ================== -->
+    <section id="writeup" class="tab-panel">
+      <section class="writeup-inner">
+        <h2>Design Notes & Project Status</h2>
+
+        <h3>What the Explorer Can Do Right Now</h3>
+        <p>
+          At this stage, the Climate Futures Explorer already lets you move between three key pieces:
+          a narrative scaffold (the scenario story beats), a world map of regions, and linked time-series
+          charts for temperature and precipitation. The UI wiring is in place: changing the region in the
+          dropdown or on the map updates both charts, and the scrollytelling column can temporarily focus
+          the view on a single emissions pathway.
+        </p>
+        <p>
+          Under the hood, we have processed CMIP6 temperature and precipitation data into CSV files that
+          can be loaded efficiently in the browser. We designed a shared charting function in D3 that
+          handles multiple scenarios at once, builds legends automatically, and animates the line transitions
+          so that scenario changes feel like a smooth “morph” rather than a hard jump.
+        </p>
+        <p>
+          On the visual side, we’ve established a consistent design language: a dark, atmospheric background,
+          lighter card-style panels for content, and color encodings that distinguish scenarios without
+          overwhelming the reader. The prototype now has enough structure that we can focus less on plumbing
+          and more on the story we want visitors to walk away with.
+        </p>
+
+        <h3>What’s Hard About Telling This Story Well</h3>
+        <p>
+          The hardest part of this project is not drawing lines on a chart—it’s deciding how much complexity
+          to show without losing the plot. CMIP6 contains multiple scenarios, regions, time periods, and model
+          runs, and it is easy to overwhelm the reader with sliders and options. Our challenge is to design
+          interactions that feel curious and inviting, rather than like operating a control panel.
+        </p>
+        <p>
+          Integrating spatial context is another challenge. Maps are great for grounding the data in place,
+          but they can easily compete with time-series views for the reader’s attention. We are still refining
+          how tightly to couple the map and the charts so that “clicking a region” feels like a natural way
+          to move the story forward, rather than just another filter.
+        </p>
+        <p>
+          Finally, there is the question of uncertainty. CMIP6 projections are not single, definitive futures;
+          they are families of model runs with different assumptions and spread. Communicating that honestly
+          without drowning the reader in confidence intervals and error bands is difficult. Our goal is to
+          add simple, readable encodings of uncertainty that support the main narrative: that broad patterns
+          of warming are robust, even if the exact numbers vary, and that our choices now tilt the odds toward
+          one branch of the future or another.
+        </p>
+      </section>
+    </section>
+
   </main>
 
   <footer>
-    <p>Prototype v0.2 – DSC 106 Fall 2025</p>
+    <p>Prototype v0.3 – DSC 106 Fall 2025</p>
   </footer>
 
   <script src="script.js"></script>
