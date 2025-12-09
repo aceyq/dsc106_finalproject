@@ -6,8 +6,6 @@
   <link rel="stylesheet" href="style.css" />
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <!-- TopoJSON for world map -->
-  <script src="https://unpkg.com/topojson-client@3"></script>
   <!-- Scrollama for scrollytelling -->
   <script src="https://unpkg.com/scrollama"></script>
 </head>
@@ -40,7 +38,7 @@
     <!-- Tabs: Explorer vs Write-Up -->
     <div id="tab-bar">
       <button class="tab-btn active" data-tab="explorer">Interactive Explorer</button>
-      <button class="tab-btn" data-tab="writeup">Design & Reflection</button>
+      <button class="tab-btn" data-tab="writeup">Design &amp; Reflection</button>
     </div>
 
     <!-- ================== EXPLORER TAB ================== -->
@@ -108,7 +106,7 @@
         <!-- Visualization column: map + controls + charts -->
         <div id="scrolly-viz">
 
-          <!-- Scenario insight strip (updated when scenario/region change) -->
+          <!-- Scenario insight strip -->
           <div id="scenario-insight" class="scenario-insight">
             <strong>SSP2-4.5 in Global:</strong>
             A middle-of-the-road future—warming is significant but not the worst case, leaving a shrinking window for adaptation.
@@ -119,15 +117,15 @@
             <h2>Locating These Futures on the Map</h2>
             <p>
               Climate change is never just a line on a chart—it’s a pattern on a map. Click a highlighted region
-              or use the dropdown below to focus on a part of the world. The temperature and precipitation charts
-              update to show how that region’s story compares to the global picture.
+              to focus on that part of the world. The temperature and precipitation charts update to show how that
+              region’s story compares to the global picture.
             </p>
             <div id="region-map" class="map-container"></div>
             <div id="region-summary" class="region-summary-card">
-              <h3>Global snapshot</h3>
+              <h3>Global snapshot under SSP2-4.5</h3>
               <p>
                 Under SSP2-4.5, global temperatures climb steadily from pre-industrial levels to the end of the
-                century. Use the controls below to see which regions warm faster or slower than the planet as a whole,
+                century. Use the map below to see which regions warm faster or slower than the planet as a whole,
                 and how their rainfall patterns drift away from “normal.”
               </p>
             </div>
@@ -137,9 +135,9 @@
           <section id="controls">
             <h2>Choose a Region, Compare Pathways</h2>
             <div class="control-row">
-              <div class="control-group">
-                <label for="region-select">Region:</label>
-                <select id="region-select"></select>
+              <div class="control-group region-label">
+                <span class="control-label">Current region:</span>
+                <span id="current-region-label">Global</span>
               </div>
 
               <div class="scenario-pills" id="scenario-pills">
@@ -150,9 +148,9 @@
               </div>
             </div>
             <p class="control-help">
-              Use the map or dropdown to pick a region. Toggle the scenario buttons to show one pathway at a time
-              or compare several. When you scroll through the story cards on the left, the explorer briefly zooms
-              in on a single pathway, then hands control back to you.
+              Use the map to pick a region. Toggle the scenario buttons to show one pathway at a time
+              or compare several. When you scroll through the story cards on the left, the explorer briefly
+              zooms in on a single pathway, then hands control back to you.
             </p>
           </section>
 
@@ -184,6 +182,56 @@
             <div id="precip-chart" class="chart-container"></div>
           </section>
 
+          <!-- Impact Snapshot -->
+          <section id="impact" class="viz-section">
+            <h2>What Does This Add Up To?</h2>
+            <p>
+              For the highlighted scenario, we compare the beginning and end of the time
+              series for this region. These numbers are approximate, but they give a
+              sense of how much the local climate shifts over a human lifetime.
+            </p>
+
+            <div id="impact-cards">
+              <div class="impact-card" id="impact-temp">
+                <h3>Warming by 2100</h3>
+                <p class="impact-value"><span id="impact-temp-delta">–</span> °C</p>
+                <p class="impact-caption" id="impact-temp-caption">
+                  Select a region and scenario to see how much warmer it gets relative to today.
+                </p>
+                <div class="impact-bar-shell">
+                  <div class="impact-bar-bg"></div>
+                  <div class="impact-bar-fill" id="impact-temp-bar"></div>
+                  <div class="impact-bar-labels">
+                    <span>+0°C</span>
+                    <span>+6°C+</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="impact-card" id="impact-precip">
+                <h3>Change in Daily Rainfall</h3>
+                <p class="impact-value"><span id="impact-precip-delta">–</span></p>
+                <p class="impact-caption" id="impact-precip-caption">
+                  We estimate how much average daily precipitation shifts between the start
+                  and end of the record.
+                </p>
+                <div class="impact-bar-shell">
+                  <div class="impact-bar-bg"></div>
+                  <div class="impact-bar-fill" id="impact-precip-bar"></div>
+                  <div class="impact-bar-labels">
+                    <span>−40%</span>
+                    <span>+40%+</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="impact-footnote">
+              Note: Values are rough differences between the earliest and latest years available in the data
+              for the selected region and scenario. They are meant for intuition, not precise forecasting.
+            </p>
+          </section>
+
           <!-- Planned narrative / future structure -->
           <section id="narrative">
             <h2>Where We Want to Take This Next</h2>
@@ -205,15 +253,15 @@
     <!-- ================== WRITE-UP TAB ================== -->
     <section id="writeup" class="tab-panel">
       <section class="writeup-inner">
-        <h2>Design Notes & Project Status</h2>
+        <h2>Design Notes &amp; Project Status</h2>
 
         <h3>What the Explorer Can Do Right Now</h3>
         <p>
           At this stage, the Climate Futures Explorer already lets you move between three key pieces:
           a narrative scaffold (the scenario story beats), a world map of regions, and linked time-series
-          charts for temperature and precipitation. The UI wiring is in place: changing the region in the
-          dropdown or on the map updates both charts, and the scrollytelling column can temporarily focus
-          the view on a single emissions pathway.
+          charts for temperature and precipitation. The UI wiring is in place: changing the region on the
+          map updates both charts, and the scrollytelling column can temporarily focus the view on a single
+          emissions pathway.
         </p>
         <p>
           Under the hood, we have processed CMIP6 temperature and precipitation data into CSV files that
@@ -255,7 +303,7 @@
   </main>
 
   <footer>
-    <p>Prototype v0.3 – DSC 106 Fall 2025</p>
+    <p>Prototype v0.4 – DSC 106 Fall 2025</p>
   </footer>
 
   <script src="script.js"></script>
