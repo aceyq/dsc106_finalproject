@@ -495,3 +495,40 @@ select {
     max-width: 100%;
   }
 }
+
+.autoplay-group {
+  margin-top: 1rem;
+}
+
+.autoplay-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+#play-pause-btn {
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  background: #0f172a;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+#play-pause-btn:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+}
+
+#year-slider {
+  flex: 1;
+}
+
+#year-label {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  min-width: 3rem;
+  text-align: right;
+}
