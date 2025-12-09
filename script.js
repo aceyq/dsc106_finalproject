@@ -229,22 +229,38 @@ function startAutoplay() {
   const slider = document.getElementById("year-slider");
   const label = document.getElementById("year-label");
   const playBtn = document.getElementById("play-pause-btn");
+
   if (!slider || !label || !playBtn) return;
 
   playBtn.textContent = "Pause";
 
-  autoplayTimer = setInterval(() => {
+  const stepSize = 5;             // move 5 years per step
+  const renderBuffer = 900;       // viewing time (ms)
+  const redrawBuffer = 350;       // chart draw time (ms)
+
+  function advance() {
+    if (!autoplayTimer) return; // autoplay was stopped
+
     let current = +slider.value;
-    let next = current + 5; // advance 5 years at a time
+    let next = current + stepSize;
 
     if (next > autoplayMaxYear) {
-      next = autoplayMinYear; // loop back
+      next = autoplayMinYear; // wrap around
     }
 
     slider.value = next;
     label.textContent = next;
+
     updateCharts();
-  }, 450); // playback speed (ms)
+
+    // Wait for charts to finish AND allow viewer time
+    autoplayTimer = setTimeout(() => {
+      advance();
+    }, redrawBuffer + renderBuffer);
+  }
+
+  // First step delay
+  autoplayTimer = setTimeout(advance, 500);
 }
 
 function stopAutoplay() {
