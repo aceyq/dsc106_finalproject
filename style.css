@@ -14,7 +14,7 @@ body {
 
 /* Scenario mood backgrounds */
 body.scn-ssp126 {
-  background: radial-gradient(circle at top, #0f172a 0%, #020617 55%, #020617 100%);
+  background: radial-gradient(circle at top, #0f172a 0%, #022c22 40%, #020617 100%);
 }
 
 body.scn-ssp245 {
@@ -22,11 +22,11 @@ body.scn-ssp245 {
 }
 
 body.scn-ssp370 {
-  background: radial-gradient(circle at top, #1f2937 0%, #020617 65%, #020617 100%);
+  background: radial-gradient(circle at top, #1f2937 0%, #7c2d12 40%, #020617 100%);
 }
 
 body.scn-ssp585 {
-  background: radial-gradient(circle at top, #7f1d1d 0%, #020617 60%, #020617 100%);
+  background: radial-gradient(circle at top, #7f1d1d 0%, #450a0a 45%, #020617 100%);
 }
 
 /* ---------- Shell ---------- */
@@ -39,7 +39,7 @@ footer {
 }
 
 header {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 header h1 {
@@ -57,7 +57,7 @@ header p {
 footer {
   text-align: center;
   font-size: 0.8rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.2);
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
 }
 
 main {
@@ -326,6 +326,24 @@ select {
   top: 80px;
 }
 
+/* Scroll progress bar */
+
+#scroll-progress {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: #111827;
+  overflow: hidden;
+  margin-bottom: 0.6rem;
+}
+
+#scroll-progress-inner {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(to right, #22c55e, #3b82f6, #f97316);
+  transition: width 0.15s ease-out;
+}
+
 .scrolly-intro {
   font-size: 0.85rem;
   color: #6b7280;
@@ -369,6 +387,23 @@ select {
   transform: translateY(-2px);
 }
 
+/* ---------- Scenario insight strip ---------- */
+
+.scenario-insight {
+  margin-bottom: 1rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.95);
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.scenario-insight strong {
+  color: #38bdf8;
+}
+
 /* ---------- Map ---------- */
 
 .map-container {
@@ -400,6 +435,25 @@ select {
 
 .region-dot.active-region {
   fill: #f97316;
+}
+
+/* Region summary card */
+
+.region-summary-card {
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.75rem;
+  background: #020617;
+  color: #e5e7eb;
+  border: 1px solid #1f2937;
+  font-size: 0.86rem;
+}
+
+.region-summary-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.35rem;
+  font-size: 0.92rem;
+  color: #e5e7eb;
 }
 
 /* ---------- Responsive ---------- */

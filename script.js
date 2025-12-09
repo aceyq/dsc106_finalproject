@@ -8,26 +8,28 @@ const tempFixedY = [4, 30];
 const precipFixedY = [1.6, 4];
 
 let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"];
+let activeScenarioForStory = "ssp245"; // for insight strip
 
-// Scenario pills
-const pills = document.querySelectorAll(".pill");
-
-// Tabs
-const tabButtons = document.querySelectorAll(".tab-btn");
-const tabPanels = document.querySelectorAll(".tab-panel");
-
-// Chart config
 const chartConfig = {
   width: 720,
   height: 320,
   margin: { top: 40, right: 20, bottom: 50, left: 70 }
 };
 
-// Map config
 const mapConfig = {
   width: 440,
   height: 260
 };
+
+// region summaries populated after data load
+let regionSummaries = {};
+
+// Tabs
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabPanels = document.querySelectorAll(".tab-panel");
+
+// Scenario pills
+const pills = document.querySelectorAll(".pill");
 
 // Tooltip for charts
 const tooltip = d3.select("body")
@@ -48,13 +50,42 @@ function scenarioLabel(key) {
   return labels[key] || key;
 }
 
-// Mood background based on scenario
+// Scenario-level narrative snippets
+const scenarioInsightTexts = {
+  ssp126:
+    "Rapid mitigation keeps warming comparatively shallow. The region still warms, but ecosystems and cities have more time to adapt.",
+  ssp245:
+    "A middle-of-the-road future. Warming is significant but not the worst case, leaving a narrowing window to prepare for regional impacts.",
+  ssp370:
+    "High emissions and uneven action. Temperatures climb faster and rainfall becomes more erratic, stressing water systems and vegetation.",
+  ssp585:
+    "A fossil-fuel intensive world. Warming is steep and rapid, pushing many regions toward thresholds where large biome shifts become likely."
+};
+
+// ============================================================
+// MOOD + NARRATIVE HELPERS
+// ============================================================
 function setScenarioMood(scenario) {
   const body = document.body;
   body.classList.remove("scn-ssp126", "scn-ssp245", "scn-ssp370", "scn-ssp585");
   if (scenario) {
     body.classList.add("scn-" + scenario);
   }
+}
+
+function renderScenarioInsight() {
+  const el = document.getElementById("scenario-insight");
+  if (!el) return;
+
+  const region = d3.select("#region-select").property("value") || "Global";
+  const msg = scenarioInsightTexts[activeScenarioForStory];
+
+  if (!msg) {
+    el.textContent = "";
+    return;
+  }
+
+  el.innerHTML = `<strong>${scenarioLabel(activeScenarioForStory)} in ${region}:</strong> ${msg}`;
 }
 
 // ============================================================
@@ -83,9 +114,11 @@ Promise.all([
   initializeControls();
   initializePills();
   initializeScrolly();
+  computeRegionSummaries();
 
   drawRegionMap();
   updateCharts();
+  renderScenarioInsight();
 
 }).catch(err => {
   console.error("Error loading CSVs:", err);
@@ -109,7 +142,7 @@ function initializeTabs() {
 }
 
 // ============================================================
-// CONTROLS (regions)
+// CONTROLS (regions + pills)
 // ============================================================
 function initializeControls() {
   const regions = Array.from(new Set(tempDataRaw.map(d => d.region))).sort();
@@ -129,6 +162,7 @@ function initializeControls() {
   regionSelect.on("change", () => {
     const value = regionSelect.property("value");
     highlightRegionDot(value);
+    renderScenarioInsight();
     updateCharts();
   });
 }
@@ -148,6 +182,87 @@ function initializePills() {
       updateCharts();
     });
   });
+}
+
+// ============================================================
+// REGION SUMMARIES (for map card)
+// ============================================================
+function computeRegionSummaries() {
+  const baseScenario = "ssp245";
+
+  const groupedTemp = d3.group(
+    tempDataRaw.filter(d => d.scenario === baseScenario),
+    d => d.region
+  );
+
+  groupedTemp.forEach((records, region) => {
+    const sorted = records.slice().sort((a, b) => a.year - b.year);
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    const deltaT = last.tas_C - first.tas_C;
+
+    const precipRecords = precipDataRaw
+      .filter(d => d.scenario === baseScenario && d.region === region)
+      .sort((a, b) => a.year - b.year);
+
+    let deltaP = null;
+    if (precipRecords.length > 1) {
+      const pFirst = precipRecords[0];
+      const pLast = precipRecords[precipRecords.length - 1];
+      deltaP = pLast.pr_day - pFirst.pr_day;
+      regionSummaries[region] = {
+        startYear: first.year,
+        endYear: last.year,
+        deltaT,
+        deltaP
+      };
+    } else {
+      regionSummaries[region] = {
+        startYear: first.year,
+        endYear: last.year,
+        deltaT,
+        deltaP: null
+      };
+    }
+  });
+}
+
+function updateRegionSummary(region) {
+  const card = document.getElementById("region-summary");
+  if (!card) return;
+
+  const summary = regionSummaries[region];
+
+  if (!summary) {
+    card.innerHTML = `
+      <h3>${region} snapshot</h3>
+      <p>
+        This region is available in the CMIP6 data set, but we do not yet compute a summary
+        statistic here. Use the charts below to explore how its temperature and precipitation
+        trajectories differ from the global average.
+      </p>
+    `;
+    return;
+  }
+
+  const { startYear, endYear, deltaT, deltaP } = summary;
+  const warming = deltaT.toFixed(1);
+  let precipText = "Precipitation changes are modest overall.";
+
+  if (deltaP !== null) {
+    const sign = deltaP > 0 ? "increase" : "decrease";
+    const amount = Math.abs(deltaP).toFixed(2);
+    precipText = `Average daily precipitation shows a ${sign} of about ${amount} mm/day over the same period.`;
+  }
+
+  card.innerHTML = `
+    <h3>${region} snapshot under SSP2-4.5</h3>
+    <p>
+      From <strong>${startYear}</strong> to <strong>${endYear}</strong>, this region warms by roughly
+      <strong>${warming}°C</strong> in the CMIP6 projections. ${precipText}
+      This provides a baseline “middle-of-the-road” future you can compare against higher or lower emission pathways.
+    </p>
+  `;
 }
 
 // ============================================================
@@ -183,6 +298,8 @@ function updateCharts() {
     fixedYDomain: precipFixedY,
     showAllScenarios: showScenarios.length > 1
   });
+
+  renderScenarioInsight();
 }
 
 // ============================================================
@@ -424,6 +541,7 @@ function drawRegionMap() {
         .on("click", (event, d) => {
           d3.select("#region-select").property("value", d.name);
           highlightRegionDot(d.name);
+          renderScenarioInsight();
           updateCharts();
         });
 
@@ -436,12 +554,19 @@ function drawRegionMap() {
 }
 
 function highlightRegionDot(regionName) {
-  d3.selectAll(".region-dot")
-    .classed("active-region", d => d.name === regionName);
+  const dots = d3.selectAll(".region-dot");
+
+  dots
+    .classed("active-region", d => d.name === regionName)
+    .transition()
+    .duration(300)
+    .attr("r", d => (d.name === regionName ? 8 : 5));
+
+  updateRegionSummary(regionName);
 }
 
 // ============================================================
-// SCROLLYTELLING (Scrollama + click on steps)
+// SCROLLYTELLING (Scrollama + progress bar + click)
 // ============================================================
 function initializeScrolly() {
   if (typeof scrollama === "undefined") {
@@ -450,8 +575,32 @@ function initializeScrolly() {
   }
 
   const steps = document.querySelectorAll("#scrolly-text .step");
+  const progressInner = document.getElementById("scroll-progress-inner");
 
-  // Scrollama
+  // Scroll progress bar
+  function updateScrollProgress() {
+    const container = document.getElementById("scrolly-text");
+    if (!container || !progressInner) return;
+
+    const rect = container.getBoundingClientRect();
+    const viewHeight = window.innerHeight || document.documentElement.clientHeight;
+
+    const total = rect.height - viewHeight;
+    if (total <= 0) {
+      progressInner.style.width = "0%";
+      return;
+    }
+
+    const scrolled = Math.min(Math.max(-rect.top, 0), total);
+    const pct = (scrolled / total) * 100;
+    progressInner.style.width = pct + "%";
+  }
+
+  window.addEventListener("scroll", updateScrollProgress);
+  window.addEventListener("resize", updateScrollProgress);
+  updateScrollProgress();
+
+  // Scrollama controller
   const scroller = scrollama();
   scroller
     .setup({
@@ -466,6 +615,7 @@ function initializeScrolly() {
       d3.selectAll("#scrolly-1 .step").classed("is-active", false);
       d3.select(el).classed("is-active", true);
 
+      activeScenarioForStory = scenario;
       setScenarioMood(scenario);
 
       // Focus on one scenario when step is active
@@ -487,6 +637,7 @@ function initializeScrolly() {
       d3.selectAll("#scrolly-1 .step").classed("is-active", false);
       d3.select(step).classed("is-active", true);
 
+      activeScenarioForStory = scenario;
       setScenarioMood(scenario);
 
       pills.forEach(p => {
@@ -500,5 +651,8 @@ function initializeScrolly() {
 
   // Initial mood
   const firstScenario = steps[0]?.dataset.scenario;
-  if (firstScenario) setScenarioMood(firstScenario);
+  if (firstScenario) {
+    activeScenarioForStory = firstScenario;
+    setScenarioMood(firstScenario);
+  }
 }
