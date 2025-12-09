@@ -489,8 +489,9 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
         .ease(d3.easeCubic)
         .attr("stroke-dashoffset", 0);
 
+      const pointsToShow = values.filter(d => d.year % 5 === 0);
       svg.selectAll(".point-" + key)
-        .data(values)
+        .data(pointsToShow)
         .join("circle")
         .attr("class", "point-" + key)
         .attr("cx", d => xScale(d.time))
