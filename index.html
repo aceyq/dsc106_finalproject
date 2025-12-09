@@ -142,6 +142,24 @@
                 <select id="region-select"></select>
               </div>
 
+              <div class="control-group autoplay-group">
+                <label for="year-slider">Play climate futures over time</label>
+                <div class="autoplay-row">
+                  <button id="play-pause-btn" type="button">Play</button>
+
+                  <input
+                    id="year-slider"
+                    type="range"
+                    min="1850"
+                    max="2100"
+                    step="5"
+                    value="1850"
+                  />
+
+                  <span id="year-label">1850</span>
+                </div>
+              </div>
+
               <div class="scenario-pills" id="scenario-pills">
                 <button class="pill active" data-scn="ssp126">SSP1-2.6</button>
                 <button class="pill active" data-scn="ssp245">SSP2-4.5</button>
