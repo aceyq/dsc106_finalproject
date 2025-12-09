@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="style.css" />
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <!-- Scrollama for scrollytelling (we'll hook this up in script.js later) -->
+  <!-- Scrollama for scrollytelling -->
   <script src="https://unpkg.com/scrollama"></script>
 </head>
 
@@ -147,14 +147,15 @@
         </div>
       </div>
 
-      <!-- Visualization column: your existing controls + charts -->
+      <!-- Visualization column: controls + charts -->
       <div id="scrolly-viz">
 
         <!-- Controls -->
         <section id="controls">
           <h2>Explore Scenarios and Regions</h2>
           <div class="control-row">
-            <!-- <div class="control-group">
+            <!-- Scenario select is unused but kept for structure if needed later
+            <div class="control-group">
               <label for="scenario-select">Scenario:</label>
               <select id="scenario-select"></select>
             </div> -->
@@ -170,7 +171,6 @@
               <button class="pill active" data-scn="ssp370">SSP3-7.0</button>
               <button class="pill active" data-scn="ssp585">SSP5-8.5</button>
             </div>
-            <!-- <div id="temp-chart-legend" class="legend"></div> -->
           </div>
           <p class="control-help">
             Use the dropdown to choose a world region. Use the buttons to select which scenario(s).

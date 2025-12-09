@@ -6,10 +6,10 @@ let precipDataRaw = [];
 let tempGlobalMin, tempGlobalMax;
 let precipGlobalMin, precipGlobalMax;
 
-const tempFixedY = [4, 30]; 
+const tempFixedY = [4, 30];
 const precipFixedY = [1.6, 4];
 
-let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"]; 
+let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"];
 
 // Scenario pills
 const pills = document.querySelectorAll(".pill");
@@ -44,7 +44,7 @@ const tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip");
 
-// Map internal names to readable labels
+// Scenario label helper
 function scenarioLabel(key) {
   const labels = {
     ssp126: "SSP1-2.6 (Low Emissions)",
@@ -84,7 +84,7 @@ Promise.all([
 
   initializeControls();
   updateCharts();
-  setupScrolly();     // <-- activate scrollytelling
+  setupScrolly();
 }).catch(err => {
   console.error("Error loading CSVs:", err);
 });
@@ -164,7 +164,7 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
   containerSel.selectAll("*").remove();
 
   const legendDiv = d3.select(container + "-legend");
-  if (!legendDiv.empty()) legendDiv.selectAll("*").remove();   // ALWAYS clear legend
+  if (!legendDiv.empty()) legendDiv.selectAll("*").remove();   // Always clear legend
 
   const { width, height, margin } = chartConfig;
 
@@ -274,7 +274,7 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
 
   } else {
 
-    // SINGLE scenario mode
+    // Single scenario mode
     svg.append("path")
       .datum(data)
       .attr("fill", "none")
@@ -322,7 +322,7 @@ function setupScrolly() {
     .setup({
       container: "#scrolly-1",
       step: "#scrolly-1 .step",
-      offset: 0.6
+      offset: 0.55
     })
     .onStepEnter((response) => {
 
@@ -338,9 +338,29 @@ function setupScrolly() {
         else p.classList.remove("active");
       });
 
-      showScenarios = [scenario];  // Focus on the narrative scenario
+      showScenarios = [scenario];  // focus on narrative scenario
       updateCharts();
     });
 
   window.addEventListener("resize", scroller.resize);
+
+  // Also allow clicking on story steps to jump scenarios
+  const stepEls = document.querySelectorAll("#scrolly-text .step");
+  stepEls.forEach(step => {
+    step.addEventListener("click", () => {
+      const scenario = step.dataset.scenario;
+      if (!scenario) return;
+
+      d3.selectAll("#scrolly-1 .step").classed("is-active", false);
+      d3.select(step).classed("is-active", true);
+
+      pills.forEach(p => {
+        if (p.dataset.scn === scenario) p.classList.add("active");
+        else p.classList.remove("active");
+      });
+
+      showScenarios = [scenario];
+      updateCharts();
+    });
+  });
 }
