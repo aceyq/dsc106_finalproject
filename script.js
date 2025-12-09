@@ -236,7 +236,7 @@ function startAutoplay() {
 
   const stepSize = 5;
   const redrawBuffer = 400;
-  const renderBuffer = 2000;
+  const renderBuffer = 1500;
 
   function advance() {
     // if autoplay was stopped while waiting, abort
