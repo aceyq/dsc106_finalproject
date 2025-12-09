@@ -10,6 +10,10 @@ const precipFixedY = [1.6, 4];
 let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"];
 let activeScenarioForStory = "ssp245"; // for insight strip
 
+let autoplayTimer = null;
+let autoplayMinYear = 1850;
+let autoplayMaxYear = 2100;
+
 const chartConfig = {
   width: 720,
   height: 320,
@@ -112,6 +116,7 @@ Promise.all([
 
   initializeTabs();
   initializeControls();
+  initializeAutoplay();
   initializePills();
   initializeScrolly();
   computeRegionSummaries();
@@ -182,6 +187,82 @@ function initializePills() {
       updateCharts();
     });
   });
+}
+
+// ============================================================
+// AUTOPLAY CONTROLS (year slider + play/pause)
+// ============================================================
+function initializeAutoplay() {
+  const slider = document.getElementById("year-slider");
+  const label = document.getElementById("year-label");
+  const playBtn = document.getElementById("play-pause-btn");
+  if (!slider || !label || !playBtn) return;
+
+  // derive year bounds from data
+  const allYears = tempDataRaw.map(d => d.year);
+  autoplayMinYear = d3.min(allYears);
+  autoplayMaxYear = d3.max(allYears);
+
+  slider.min = autoplayMinYear;
+  slider.max = autoplayMaxYear;
+  slider.value = autoplayMinYear;
+  label.textContent = autoplayMinYear;
+
+  // manual slider drag
+  slider.addEventListener("input", () => {
+    label.textContent = slider.value;
+    stopAutoplay(); // stop if user takes over
+    updateCharts();
+  });
+
+  // play / pause click
+  playBtn.addEventListener("click", () => {
+    if (autoplayTimer) {
+      stopAutoplay();
+    } else {
+      startAutoplay();
+    }
+  });
+}
+
+function startAutoplay() {
+  const slider = document.getElementById("year-slider");
+  const label = document.getElementById("year-label");
+  const playBtn = document.getElementById("play-pause-btn");
+  if (!slider || !label || !playBtn) return;
+
+  playBtn.textContent = "Pause";
+
+  autoplayTimer = setInterval(() => {
+    let current = +slider.value;
+    let next = current + 5; // advance 5 years at a time
+
+    if (next > autoplayMaxYear) {
+      next = autoplayMinYear; // loop back
+    }
+
+    slider.value = next;
+    label.textContent = next;
+    updateCharts();
+  }, 450); // playback speed (ms)
+}
+
+function stopAutoplay() {
+  const playBtn = document.getElementById("play-pause-btn");
+  if (autoplayTimer) {
+    clearInterval(autoplayTimer);
+    autoplayTimer = null;
+  }
+  if (playBtn) {
+    playBtn.textContent = "Play";
+  }
+}
+
+function filterBySliderYear(data) {
+  const slider = document.getElementById("year-slider");
+  if (!slider) return data;
+  const cutoff = +slider.value;
+  return data.filter(d => d.year <= cutoff);
 }
 
 // ============================================================
@@ -271,13 +352,17 @@ function updateRegionSummary(region) {
 function updateCharts() {
   const region = d3.select("#region-select").property("value");
 
-  const tempFiltered = tempDataRaw
+  let tempFiltered = tempDataRaw
     .filter(d => showScenarios.includes(d.scenario) && d.region === region)
     .sort((a, b) => d3.ascending(a.time, b.time));
 
-  const precipFiltered = precipDataRaw
+  let precipFiltered = precipDataRaw
     .filter(d => showScenarios.includes(d.scenario) && d.region === region)
     .sort((a, b) => d3.ascending(a.time, b.time));
+
+  // apply autoplay time filter
+  tempFiltered = filterBySliderYear(tempFiltered);
+  precipFiltered = filterBySliderYear(precipFiltered);
 
   drawLineChart({
     container: "#temp-chart",
