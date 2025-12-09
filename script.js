@@ -1,48 +1,50 @@
-// Global variables to store data
+// ------------------------------------------------------------
+// Global variables
+// ------------------------------------------------------------
 let tempDataRaw = [];
 let precipDataRaw = [];
 let tempGlobalMin, tempGlobalMax;
 let precipGlobalMin, precipGlobalMax;
 
-const tempFixedY = [4, 30]; // adjust based on your data
-const precipFixedY = [1.6, 4]; // adjust to your max values
+const tempFixedY = [4, 30]; 
+const precipFixedY = [1.6, 4];
 
-let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"]; // default all
+let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"]; 
+
+// Scenario pills
 const pills = document.querySelectorAll(".pill");
-
 pills.forEach(pill => {
   pill.addEventListener("click", () => {
     const scenario = pill.dataset.scn;
 
-    // toggle active class
+    // Toggle pill
     pill.classList.toggle("active");
 
-    // update array of selected scenarios
+    // Update selected scenarios
     showScenarios = Array.from(pills)
       .filter(p => p.classList.contains("active"))
       .map(p => p.dataset.scn);
 
-    // update charts
     updateCharts();
   });
 });
 
-// Date parser for "YYYY-MM-DD HH:MM:SS"
+// Date parser
 const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
-// Dimensions for charts
+// Chart dimensions
 const chartConfig = {
-    width: 720,
-    height: 320,
-    margin: { top: 40, right: 20, bottom: 50, left: 70 }
-  };
+  width: 720,
+  height: 320,
+  margin: { top: 40, right: 20, bottom: 50, left: 70 }
+};
 
-// Create a single tooltip div (shared by both charts)
+// Tooltip
 const tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip");
 
-// Helper: scenario label
+// Map internal names to readable labels
 function scenarioLabel(key) {
   const labels = {
     ssp126: "SSP1-2.6 (Low Emissions)",
@@ -53,7 +55,9 @@ function scenarioLabel(key) {
   return labels[key] || key;
 }
 
-// Load data
+// ------------------------------------------------------------
+// Load temperature + precipitation data
+// ------------------------------------------------------------
 Promise.all([
   d3.csv("temp_df.csv", d => ({
     time: parseTime(d.time),
@@ -79,20 +83,18 @@ Promise.all([
   precipGlobalMax = d3.max(precipDataRaw, d => d.pr_day);
 
   initializeControls();
-  updateCharts(); // draw initial charts
+  updateCharts();
+  setupScrolly();     // <-- activate scrollytelling
 }).catch(err => {
   console.error("Error loading CSVs:", err);
 });
 
-// Initialize dropdowns based on data
+// ------------------------------------------------------------
+// Dropdown (region) initialization
+// ------------------------------------------------------------
 function initializeControls() {
-  const scenarios = Array.from(
-    new Set(tempDataRaw.map(d => d.scenario))
-  ).sort();
-
-  const regions = Array.from(
-    new Set(tempDataRaw.map(d => d.region))
-  ).sort();
+  const scenarios = Array.from(new Set(tempDataRaw.map(d => d.scenario))).sort();
+  const regions = Array.from(new Set(tempDataRaw.map(d => d.region))).sort();
 
   const scenarioSelect = d3.select("#scenario-select");
   const regionSelect = d3.select("#region-select");
@@ -111,24 +113,19 @@ function initializeControls() {
     .attr("value", d => d)
     .text(d => d);
 
-  // Default selection: SSP2-4.5 & Global, if available
-  if (scenarios.includes("ssp245")) {
-    scenarioSelect.property("value", "ssp245");
-  }
-  if (regions.includes("Global")) {
-    regionSelect.property("value", "Global");
-  }
+  if (scenarios.includes("ssp245")) scenarioSelect.property("value", "ssp245");
+  if (regions.includes("Global")) regionSelect.property("value", "Global");
 
-  // Listeners
   scenarioSelect.on("change", updateCharts);
   regionSelect.on("change", updateCharts);
 }
 
-// Filter data and redraw both charts
+// ------------------------------------------------------------
+// Main update function for both charts
+// ------------------------------------------------------------
 function updateCharts() {
   const region = d3.select("#region-select").property("value");
 
-  // filter data by active scenarios and selected region
   const tempFiltered = tempDataRaw
     .filter(d => showScenarios.includes(d.scenario) && d.region === region)
     .sort((a, b) => d3.ascending(a.time, b.time));
@@ -158,12 +155,19 @@ function updateCharts() {
   });
 }
 
-// // Generic line chart drawing function using D3
+// ------------------------------------------------------------
+// Draw line chart (supports 1 or many scenarios)
+// ------------------------------------------------------------
 function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain, showAllScenarios }) {
+
   const containerSel = d3.select(container);
   containerSel.selectAll("*").remove();
 
+  const legendDiv = d3.select(container + "-legend");
+  if (!legendDiv.empty()) legendDiv.selectAll("*").remove();   // ALWAYS clear legend
+
   const { width, height, margin } = chartConfig;
+
   const svg = containerSel.append("svg")
     .attr("viewBox", `0 0 ${width} ${height}`)
     .attr("preserveAspectRatio", "xMidYMid meet");
@@ -174,7 +178,7 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
       .attr("y", height / 2)
       .attr("text-anchor", "middle")
       .attr("fill", "#64748b")
-      .text("No data available for this selection.");
+      .text("No data available.");
     return;
   }
 
@@ -195,12 +199,11 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(yScale).ticks(5));
 
-  // Axis labels
+  // Labels
   svg.append("text")
     .attr("x", width / 2)
     .attr("y", height - 10)
     .attr("text-anchor", "middle")
-    .attr("font-size", "0.8rem")
     .text("Year");
 
   svg.append("text")
@@ -208,15 +211,14 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     .attr("x", -height / 2)
     .attr("y", 18)
     .attr("text-anchor", "middle")
-    .attr("font-size", "0.8rem")
     .text(yLabel);
 
   // Title
   svg.append("text")
     .attr("x", margin.left)
     .attr("y", margin.top - 15)
-    .attr("font-size", "0.95rem")
     .attr("font-weight", "600")
+    .attr("font-size", "0.95rem")
     .text(title);
 
   const line = d3.line()
@@ -224,20 +226,19 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     .y(d => yScale(yAccessor(d)));
 
   if (showAllScenarios) {
+
     const nested = d3.group(data, d => d.scenario);
-    const legendDiv = d3.select(container + "-legend");
-    legendDiv.selectAll("*").remove();
     const color = d3.scaleOrdinal(d3.schemeCategory10)
       .domain(Array.from(nested.keys()));
+
+    // Make legend
     Array.from(nested.keys()).forEach(key => {
       const item = legendDiv.append("div").attr("class", "legend-item");
-      item.append("div")
-          .style("background-color", color(key));
-      item.append("span")
-          .text(scenarioLabel(key));
+      item.append("div").style("background-color", color(key));
+      item.append("span").text(scenarioLabel(key));
     });
 
-    // Draw lines and points
+    // Multi-lines
     nested.forEach((values, key) => {
       svg.append("path")
         .datum(values)
@@ -256,9 +257,11 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
         .attr("fill", color(key))
         .on("mouseenter", (event, d) => {
           tooltip.style("opacity", 1)
-            .html(`<strong>Scenario:</strong> ${scenarioLabel(key)}<br/>
-                   <strong>Year:</strong> ${d.year}<br/>
-                   <strong>Value:</strong> ${yAccessor(d).toFixed(2)}`)
+            .html(
+              `<strong>${scenarioLabel(key)}</strong><br/>
+               Year: ${d.year}<br/>
+               Value: ${yAccessor(d).toFixed(2)}`
+            )
             .style("left", (event.pageX + 10) + "px")
             .style("top", (event.pageY - 28) + "px");
         })
@@ -269,18 +272,9 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
         .on("mouseleave", () => tooltip.style("opacity", 0));
     });
 
-    // Legend
-    // const legend = svg.append("g")
-    //   .attr("transform", `translate(${width - margin.right - 150}, ${margin.top})`);
-
-    // Array.from(nested.keys()).forEach((key, i) => {
-    //   const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
-    //   g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(key));
-    //   g.append("text").attr("x", 16).attr("y", 10).text(scenarioLabel(key)).attr("font-size", "0.75rem");
-    // });
-
   } else {
-    // Single scenario
+
+    // SINGLE scenario mode
     svg.append("path")
       .datum(data)
       .attr("fill", "none")
@@ -298,8 +292,10 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
       .attr("fill", "#1d4ed8")
       .on("mouseenter", (event, d) => {
         tooltip.style("opacity", 1)
-          .html(`<strong>Year:</strong> ${d.year}<br/>
-                 <strong>Value:</strong> ${yAccessor(d).toFixed(2)}`)
+          .html(
+            `Year: ${d.year}<br/>
+             Value: ${yAccessor(d).toFixed(2)}`
+          )
           .style("left", (event.pageX + 10) + "px")
           .style("top", (event.pageY - 28) + "px");
       })
@@ -309,4 +305,42 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
       })
       .on("mouseleave", () => tooltip.style("opacity", 0));
   }
+}
+
+// ------------------------------------------------------------
+// SCROLLYTELLING: sync story steps → active scenario
+// ------------------------------------------------------------
+function setupScrolly() {
+  if (typeof scrollama === "undefined") {
+    console.warn("Scrollama missing.");
+    return;
+  }
+
+  const scroller = scrollama();
+
+  scroller
+    .setup({
+      container: "#scrolly-1",
+      step: "#scrolly-1 .step",
+      offset: 0.6
+    })
+    .onStepEnter((response) => {
+
+      d3.selectAll("#scrolly-1 .step").classed("is-active", false);
+      d3.select(response.element).classed("is-active", true);
+
+      const scenario = response.element.dataset.scenario;
+      if (!scenario) return;
+
+      // Sync pills
+      pills.forEach(p => {
+        if (p.dataset.scn === scenario) p.classList.add("active");
+        else p.classList.remove("active");
+      });
+
+      showScenarios = [scenario];  // Focus on the narrative scenario
+      updateCharts();
+    });
+
+  window.addEventListener("resize", scroller.resize);
 }

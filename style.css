@@ -1,129 +1,129 @@
 /* ---------- Global ---------- */
 
 * {
-    box-sizing: border-box;
-  }
-  
-  body {
-    margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    line-height: 1.6;
-    color: #0f172a;
-    background: #0f172a;
-  }
-  
-  /* ---------- Shell ---------- */
-  
-  header,
-  footer {
-    background: #020617;
-    color: #e5e7eb;
-    padding: 1rem 1.5rem;
-  }
-  
-  header {
-    border-bottom: 1px solid #1f2937;
-  }
-  
-  header h1 {
-    margin: 0;
-    font-size: 1.6rem;
-    letter-spacing: 0.03em;
-  }
-  
-  header p {
-    margin: 0.2rem 0 0;
-    font-size: 0.9rem;
-    color: #9ca3af;
-  }
-  
-  footer {
-    text-align: center;
-    font-size: 0.8rem;
-    border-top: 1px solid #1f2937;
-  }
-  
-  main {
-    max-width: 1000px;
-    margin: 1.75rem auto 2.5rem auto;
-    padding: 0 1.25rem;
-  }
-  
-  /* ---------- Sections ---------- */
-  
-  section {
-    margin-bottom: 1.75rem;
-    background: #f9fafb;
-    border-radius: 0.9rem;
-    padding: 1.1rem 1.3rem 1.3rem 1.3rem;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
-  }
-  
-  section#intro {
-    background: linear-gradient(135deg, #eff6ff, #f9fafb);
-  }
-  
-  section h2 {
-    margin-top: 0;
-    margin-bottom: 0.4rem;
-    font-size: 1.2rem;
-  }
-  
-  section p {
-    margin: 0.25rem 0;
-    font-size: 0.95rem;
-    color: #4b5563;
-    max-width: 70ch;
-  }
-  
-  section ul {
-    margin: 0.25rem 0 0.25rem 1.1rem;
-    padding: 0;
-    font-size: 0.95rem;
-    color: #4b5563;
-  }
-  
-  /* ---------- Controls ---------- */
-  
-  #controls {
-    background: #f1f5f9;
-  }
-  
-  .control-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: flex-end;
-    margin-top: 0.3rem;
-  }
-  
-  .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-  
-  label {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #334155;
-  }
-  
-  select {
-    padding: 0.35rem 0.6rem;
-    border-radius: 0.6rem;
-    border: 1px solid #cbd5e1;
-    background: #ffffff;
-    font-size: 0.9rem;
-    color: #0f172a;
-  }
-  
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  color: #0f172a;
+  background: #0f172a;
+}
+
+/* ---------- Shell ---------- */
+
+header,
+footer {
+  background: #020617;
+  color: #e5e7eb;
+  padding: 1rem 1.5rem;
+}
+
+header {
+  border-bottom: 1px solid #1f2937;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.03em;
+}
+
+header p {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: #9ca3af;
+}
+
+footer {
+  text-align: center;
+  font-size: 0.8rem;
+  border-top: 1px solid #1f2937;
+}
+
+main {
+  max-width: 1000px;
+  margin: 1.75rem auto 2.5rem auto;
+  padding: 0 1.25rem;
+}
+
+/* ---------- Sections ---------- */
+
+section {
+  margin-bottom: 1.75rem;
+  background: #f9fafb;
+  border-radius: 0.9rem;
+  padding: 1.1rem 1.3rem 1.3rem 1.3rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+}
+
+section#intro {
+  background: linear-gradient(135deg, #eff6ff, #f9fafb);
+}
+
+section h2 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  font-size: 1.2rem;
+}
+
+section p {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+  color: #4b5563;
+  max-width: 70ch;
+}
+
+section ul {
+  margin: 0.25rem 0 0.25rem 1.1rem;
+  padding: 0;
+  font-size: 0.95rem;
+  color: #4b5563;
+}
+
+/* ---------- Controls ---------- */
+
+#controls {
+  background: #f1f5f9;
+}
+
+.control-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-top: 0.3rem;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #334155;
+}
+
+select {
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.6rem;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
 .control-help {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin-top: 0.6rem;
-  }
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.6rem;
+}
 
 .scenario-pills {
   display: flex;
@@ -133,16 +133,16 @@
 }
 
 .pill {
-  padding: 4px 12px;       /* smaller padding */
-  border-radius: 16px;     /* slightly smaller pill shape */
+  padding: 4px 12px;
+  border-radius: 16px;
   border: 2px solid #90a4ae;
   background-color: #f0f4f8;
   color: #607d8b;
-  font-size: 0.75rem;      /* smaller text */
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* lighter shadow */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .pill:hover {
@@ -158,8 +158,8 @@
 
 .chart-header {
   display: flex;
-  justify-content: flex-end; /* moves legend to top-right */
-  margin-bottom: 6px;       /* space between legend and chart */
+  justify-content: flex-end;
+  margin-bottom: 6px;
   margin-top: -90px;
 }
 
@@ -167,12 +167,11 @@
   display: flex;
   top: 10px;
   right: 10px;
-  display: flex;
   flex-direction: column;
-  background-color: rgba(255, 255, 255, 0.85); /* optional: semi-transparent bg */
+  background-color: rgba(255, 255, 255, 0.85);
   padding: 6px 10px;
   border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   font-size: 0.75rem;
   color: #1e293b;
   z-index: 10;
@@ -191,65 +190,138 @@
   border-radius: 2px;
 }
 
-  
-  /* ---------- Charts ---------- */
-  
-  .viz-section {
-    background: #ffffff;
+/* ---------- Charts ---------- */
+
+.viz-section {
+  background: #ffffff;
+}
+
+.chart-container {
+  margin-top: 0.6rem;
+  background-color: #f8fafc;
+  border-radius: 0.8rem;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.7rem 0.4rem 0.7rem;
+  max-width: 820px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* SVG axes */
+
+.axis path,
+.axis line {
+  stroke: #cbd5e1;
+}
+
+.axis text {
+  font-size: 0.7rem;
+  fill: #64748b;
+}
+
+/* Tooltip */
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background-color: #ffffff;
+  border: 1px solid #cbd5f5;
+  padding: 4px 6px;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  color: #0f172a;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+  opacity: 0;
+  transition: opacity 0.1s ease-in-out;
+}
+
+/* ---------- Scrollytelling layout ---------- */
+
+#scrolly-1 {
+  position: relative;
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+#scrolly-text {
+  flex: 1;
+  max-width: 460px;
+}
+
+#scrolly-viz {
+  flex: 1;
+  position: sticky;
+  top: 80px; /* adjust if header height changes */
+}
+
+.scrolly-intro {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-bottom: 0.6rem;
+  max-width: 36rem;
+}
+
+/* Narrative steps on the left */
+#scrolly-text .step {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0.75rem;
+  background: #020617;
+  border: 1px solid #1f2937;
+  color: #e5e7eb;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease,
+              background-color 0.2s ease;
+}
+
+#scrolly-text .step h3 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+  color: #e5e7eb;
+  font-size: 0.98rem;
+}
+
+#scrolly-text .step p {
+  color: #cbd5f5;
+  max-width: none;
+  font-size: 0.9rem;
+}
+
+/* Active step highlight when it's in focus */
+#scrolly-text .step.is-active {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5),
+              0 10px 30px rgba(15, 23, 42, 0.45);
+  background: #020617;
+  transform: translateY(-2px);
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 768px) {
+  main {
+    padding: 0 0.75rem;
   }
-  
-  .chart-container {
-    margin-top: 0.6rem;
-    background-color: #f8fafc;
-    border-radius: 0.8rem;
-    border: 1px solid #e2e8f0;
-    padding: 0.5rem 0.7rem 0.4rem 0.7rem;
-    max-width: 820px;
-    margin-left: auto;
-    margin-right: auto;
+
+  section {
+    padding: 0.9rem 0.9rem 1.1rem 0.9rem;
   }
-  
-  /* SVG axes */
-  
-  .axis path,
-  .axis line {
-    stroke: #cbd5e1;
+
+  header h1 {
+    font-size: 1.4rem;
   }
-  
-  .axis text {
-    font-size: 0.7rem;
-    fill: #64748b;
+
+  /* Stack scrolly columns and disable sticky on small screens */
+  #scrolly-1 {
+    flex-direction: column;
   }
-  
-  /* Tooltip */
-  
-  .tooltip {
-    position: absolute;
-    pointer-events: none;
-    background-color: #ffffff;
-    border: 1px solid #cbd5f5;
-    padding: 4px 6px;
-    border-radius: 0.4rem;
-    font-size: 0.75rem;
-    color: #0f172a;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
-    opacity: 0;
-    transition: opacity 0.1s ease-in-out;
+
+  #scrolly-viz {
+    position: static;
+    top: auto;
   }
-  
-  /* ---------- Responsive ---------- */
-  
-  @media (max-width: 768px) {
-    main {
-      padding: 0 0.75rem;
-    }
-  
-    section {
-      padding: 0.9rem 0.9rem 1.1rem 0.9rem;
-    }
-  
-    header h1 {
-      font-size: 1.4rem;
-    }
+
+  #scrolly-text {
+    max-width: 100%;
   }
-  
+}

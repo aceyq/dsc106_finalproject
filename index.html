@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="style.css" />
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- Scrollama for scrollytelling (we'll hook this up in script.js later) -->
+  <script src="https://unpkg.com/scrollama"></script>
 </head>
 
 <body>
@@ -92,61 +94,119 @@
       </p>
     </section>
 
-    <!-- Controls -->
-    <section id="controls">
-      <h2>Explore Scenarios and Regions</h2>
-      <div class="control-row">
-        <!-- <div class="control-group">
-          <label for="scenario-select">Scenario:</label>
-          <select id="scenario-select"></select>
-        </div> -->
+    <!-- SCROLLYTELLING SECTION: story on left, controls+charts on right -->
+    <section id="scrolly-1">
+      <!-- Story / narrative column -->
+      <div id="scrolly-text">
+        <h2>How Different Climate Futures Diverge</h2>
+        <p class="scrolly-intro">
+          Scroll through the story beats below. Each step highlights a different CMIP6 emissions
+          pathway. As you move down the page, the visualizations on the right will focus on that
+          scenario, while the region dropdown lets you see how the same pathway plays out in
+          different parts of the world.
+        </p>
 
-        <div class="control-group">
-          <label for="region-select">Region:</label>
-          <select id="region-select"></select>
+        <div class="step" data-scenario="ssp126">
+          <h3>SSP1-2.6 – Rapid mitigation</h3>
+          <p>
+            In a world that aggressively cuts emissions, global temperature still rises,
+            but the curve stays relatively shallow. Precipitation changes are present,
+            yet less extreme, giving ecosystems more time to adapt before major biome
+            shifts are locked in.
+          </p>
         </div>
 
-        <div class="scenario-pills" id="scenario-pills">
-          <button class="pill active" data-scn="ssp126">SSP1-2.6</button>
-          <button class="pill active" data-scn="ssp245">SSP2-4.5</button>
-          <button class="pill active" data-scn="ssp370">SSP3-7.0</button>
-          <button class="pill active" data-scn="ssp585">SSP5-8.5</button>
+        <div class="step" data-scenario="ssp245">
+          <h3>SSP2-4.5 – “Middle-of-the-road” pathway</h3>
+          <p>
+            This pathway is close to our current trajectory. Warming accelerates after
+            mid-century, and precipitation shifts become more noticeable—more intense
+            rainfall in some regions and drying in others—raising pressure on crops,
+            forests, and water systems.
+          </p>
         </div>
-        <!-- <div id="temp-chart-legend" class="legend"></div> -->
-      </div>
-      <p class="control-help">
-        Use the dropdown to choose a world region. Use the buttons to select which scenario(s). Both charts 
-        below will update to reflect your selection.
-      </p>
-    </section>
 
-    <!-- Temperature Viz -->
-    <section id="viz-temp" class="viz-section">
-      <h2>Projected Temperature Change</h2>
-      <p>
-        This chart shows projected near-surface air temperature (°C) for the selected scenario
-        and region from 1850 to 2100 (where available). Higher-emissions scenarios typically
-        lead to steeper warming.
-      </p>
-      <!-- <div id="temp-chart" class="chart-container"></div> -->
-      <div class="chart-header">
-        <div id="temp-chart-legend" class="legend"></div>
-      </div>
-      <div id="temp-chart" class="chart-container"></div>
-    </section>
+        <div class="step" data-scenario="ssp370">
+          <h3>SSP3-7.0 – High emissions, uneven action</h3>
+          <p>
+            In this scenario, global cooperation stalls. Temperatures climb much more
+            steeply, and rainfall patterns become more volatile. Some regions face
+            repeated droughts while others see heavier downpours, increasing the risk
+            of vegetation stress and biome disruption.
+          </p>
+        </div>
 
-    <!-- Precip Viz -->
-    <section id="viz-precip" class="viz-section">
-      <h2>Projected Precipitation Change</h2>
-      <p>
-        This chart shows projected daily precipitation (mm/day) for the same scenario and region.
-        Changes in rainfall patterns can contribute to vegetation greening, browning, or biome shifts.
-      </p>
-      <!-- <div id="precip-chart" class="chart-container"></div> -->
-      <div class="chart-header">
-        <div id="precip-chart-legend" class="legend"></div>
+        <div class="step" data-scenario="ssp585">
+          <h3>SSP5-8.5 – Fossil-fuel intensive future</h3>
+          <p>
+            This fossil-fuel heavy world leads to the fastest warming and the largest
+            shifts in precipitation. It represents a “worst-case” benchmark where
+            ecosystems have the least time to adapt, and the likelihood of large-scale
+            biome transitions is highest.
+          </p>
+        </div>
       </div>
-      <div id="precip-chart" class="chart-container"></div>
+
+      <!-- Visualization column: your existing controls + charts -->
+      <div id="scrolly-viz">
+
+        <!-- Controls -->
+        <section id="controls">
+          <h2>Explore Scenarios and Regions</h2>
+          <div class="control-row">
+            <!-- <div class="control-group">
+              <label for="scenario-select">Scenario:</label>
+              <select id="scenario-select"></select>
+            </div> -->
+
+            <div class="control-group">
+              <label for="region-select">Region:</label>
+              <select id="region-select"></select>
+            </div>
+
+            <div class="scenario-pills" id="scenario-pills">
+              <button class="pill active" data-scn="ssp126">SSP1-2.6</button>
+              <button class="pill active" data-scn="ssp245">SSP2-4.5</button>
+              <button class="pill active" data-scn="ssp370">SSP3-7.0</button>
+              <button class="pill active" data-scn="ssp585">SSP5-8.5</button>
+            </div>
+            <!-- <div id="temp-chart-legend" class="legend"></div> -->
+          </div>
+          <p class="control-help">
+            Use the dropdown to choose a world region. Use the buttons to select which scenario(s).
+            Both charts below will update to reflect your selection. The narrative on the left
+            highlights one scenario at a time to guide your attention.
+          </p>
+        </section>
+
+        <!-- Temperature Viz -->
+        <section id="viz-temp" class="viz-section">
+          <h2>Projected Temperature Change</h2>
+          <p>
+            This chart shows projected near-surface air temperature (°C) for the selected scenario
+            and region from 1850 to 2100 (where available). Higher-emissions scenarios typically
+            lead to steeper warming.
+          </p>
+          <div class="chart-header">
+            <div id="temp-chart-legend" class="legend"></div>
+          </div>
+          <div id="temp-chart" class="chart-container"></div>
+        </section>
+
+        <!-- Precip Viz -->
+        <section id="viz-precip" class="viz-section">
+          <h2>Projected Precipitation Change</h2>
+          <p>
+            This chart shows projected daily precipitation (mm/day) for the same scenario and region.
+            Changes in rainfall patterns can contribute to vegetation greening, browning, or biome shifts.
+          </p>
+          <div class="chart-header">
+            <div id="precip-chart-legend" class="legend"></div>
+          </div>
+          <div id="precip-chart" class="chart-container"></div>
+        </section>
+
+      </div>
     </section>
 
     <!-- Future Narrative Placeholder -->
