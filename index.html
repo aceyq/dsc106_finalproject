@@ -6,14 +6,16 @@
   <link rel="stylesheet" href="style.css" />
   <!-- D3.js -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- TopoJSON for world map -->
+  <script src="https://unpkg.com/topojson-client@3"></script>
   <!-- Scrollama for scrollytelling -->
   <script src="https://unpkg.com/scrollama"></script>
 </head>
 
-<body>
+<body class="scn-ssp245">
   <header>
     <h1>Climate Futures Explorer</h1>
-    <p>DSC 106 Final Project – Initial Prototype</p>
+    <p>DSC 106 Final Project – Interactive Prototype</p>
   </header>
 
   <main>
@@ -24,208 +26,218 @@
       <p>
         This prototype explores how projected changes in global temperature and precipitation
         under different CMIP6 scenarios may shape future climate patterns and global vegetation.
-        Users can compare emission pathways and regional outcomes using the controls below.
+        Users can compare emission pathways and regional outcomes using the interactive explorer below.
       </p>
       <p>
-        The current version focuses on two core time series visualizations. Future iterations
-        will add narrative annotations, maps, and explicit links to vegetation and biome changes.
+        The current version focuses on two core time-series visualizations and a world map for regional
+        context. Future iterations will add more detailed biome indicators and uncertainty views.
       </p>
     </section>
 
-    <!-- WRITEUP SECTION REQUIRED BY THE ASSIGNMENT -->
-    <section id="writeup">
-      <h2>Project Write-Up</h2>
+    <!-- Tabs: Explorer vs Write-Up -->
+    <div id="tab-bar">
+      <button class="tab-btn active" data-tab="explorer">Climate Explorer</button>
+      <button class="tab-btn" data-tab="writeup">Project Write-Up</button>
+    </div>
 
-      <h3>1. What have you done so far?</h3>
-      <p>
-        So far, we have built the core structure of the Climate Futures Explorer prototype, including
-        the user interface, dropdown controls, and two main D3 time-series visualizations. We have
-        connected the charts to scenario and region selectors so that the user can dynamically
-        explore differences in future climate projections. We also integrated processed temperature
-        and precipitation datasets from the CMIP6 archive and ensured they load efficiently through
-        JavaScript. Additionally, we created a cohesive design system with consistent styling,
-        padded card components, and a dark background theme to increase readability and focus.
-      </p>
-      <p>
-        Beyond the visuals, we have outlined the narrative flow that the final project will follow,
-        including how temperature trends, precipitation shifts, and ecological responses will be
-        introduced in a step-by-step story. We set up the structure for adding future annotations
-        and explanations to guide users toward important insights. Overall, the prototype now
-        includes all foundational elements needed for the explorable explanation we plan to build.
-      </p>
-      <p>
-        We have also begun experimenting with alternative visualization ideas, including preliminary 
-        map mockups and concept sketches for a linked-view interface that connects spatial patterns to 
-        the time-series trends already implemented. This early design exploration helps us evaluate which 
-        visual forms best support the story we want to tell and where future improvements should be targeted. 
-        In parallel, we organized our data-processing workflow so new CMIP6 variables or vegetation indicators 
-        can be incorporated seamlessly later. By establishing a flexible codebase and clear visual direction 
-        at this stage, we are preparing the foundation needed to scale the project into a richer explorable 
-        explanation.
-      </p>
+    <!-- ================== EXPLORER TAB ================== -->
+    <section id="explorer" class="tab-panel active">
 
-      <h3>2. What will be the most challenging part of the project and why?</h3>
-      <p>
-        The most challenging part of the project will be designing an integrated narrative that
-        smoothly connects the climate variables to ecological outcomes while keeping the interface
-        intuitive and uncluttered. Climate data is inherently complex, and adding meaningful
-        explanations without overwhelming users requires careful information design. Another major
-        difficulty will be integrating spatial data, such as maps or vegetation classifications,
-        into the existing time-series framework. Ensuring that the visual transitions feel coherent
-        and that users understand how each chart relates to the evolving story will take significant
-        iteration.
-      </p>
-      <p>
-        We also anticipate challenges in balancing interactivity with interpretability. As we add
-        more layers—scenarios, regions, biome indicators, and narrative steps—it becomes harder to
-        maintain visual clarity and avoid cognitive overload. Developing a layout that supports
-        multiple linked views while remaining visually clean will require thoughtful prototyping
-        and user-first design decisions. Ultimately, the biggest challenge is not technical, but
-        ensuring the final narrative remains compelling, accessible, and scientifically accurate.
-      </p>
-      <p>
-        Another possible challenge will be communicating uncertainty responsibly without overwhelming 
-        users with technical details. CMIP6 models contain variability across institutions, scenarios, 
-        and ensemble members, and presenting this uncertainty transparently, whether through error bands, 
-        model spreads, or qualitative explanations, requires careful judgment. We want viewers to understand 
-        both the robustness of long-term climate trends and the nuance in regional projections. Finding the 
-        right level of detail and the right visual encodings to convey uncertainty will be essential to 
-        maintaining scientific accuracy while still providing a smooth, engaging user experience.
-      </p>
+      <!-- SCROLLYTELLING: story on left, map + charts on right -->
+      <section id="scrolly-1">
+        <!-- Story / narrative column -->
+        <div id="scrolly-text">
+          <h2>How Different Climate Futures Diverge</h2>
+          <p class="scrolly-intro">
+            Scroll through the story beats below or click a scenario card. Each step highlights a different CMIP6
+            emissions pathway. The explorer on the right focuses on that scenario, while the region map and dropdown
+            let you see how the same pathway plays out in different parts of the world.
+          </p>
+
+          <div class="step is-active" data-scenario="ssp126">
+            <h3>SSP1-2.6 – Rapid mitigation</h3>
+            <p>
+              Aggressive emissions cuts keep global warming comparatively shallow. Ecosystems still face stress,
+              but slower changes give forests, crops, and cities more time to adapt before major biome shifts lock in.
+            </p>
+          </div>
+
+          <div class="step" data-scenario="ssp245">
+            <h3>SSP2-4.5 – “Middle-of-the-road” pathway</h3>
+            <p>
+              This pathway is close to our current trajectory. Warming accelerates after mid-century, and
+              precipitation shifts become more noticeable—heavier downpours in some regions and drying in others—
+              raising risks for crops, water systems, and fire-prone landscapes.
+            </p>
+          </div>
+
+          <div class="step" data-scenario="ssp370">
+            <h3>SSP3-7.0 – High emissions, uneven action</h3>
+            <p>
+              Global cooperation stalls. Temperatures climb much more steeply, and rainfall patterns become more
+              volatile. Some regions face repeated droughts while others see heavier storms, increasing the chance
+              of vegetation stress and abrupt biome disruption.
+            </p>
+          </div>
+
+          <div class="step" data-scenario="ssp585">
+            <h3>SSP5-8.5 – Fossil-fuel intensive future</h3>
+            <p>
+              This fossil-fuel heavy world leads to the fastest warming and the largest shifts in precipitation.
+              It serves as a “worst-case” benchmark where ecosystems have the least time to adapt and large-scale
+              biome transitions become much more likely.
+            </p>
+          </div>
+        </div>
+
+        <!-- Visualization column: map + controls + charts -->
+        <div id="scrolly-viz">
+
+          <!-- Region Map -->
+          <section id="map-section" class="viz-section">
+            <h2>Where in the World?</h2>
+            <p>
+              Click a highlighted region on the map or use the dropdown below to change the view. The charts update
+              to show how that part of the world responds under the selected scenario(s).
+            </p>
+            <div id="region-map" class="map-container"></div>
+          </section>
+
+          <!-- Controls -->
+          <section id="controls">
+            <h2>Explore Scenarios and Regions</h2>
+            <div class="control-row">
+              <div class="control-group">
+                <label for="region-select">Region:</label>
+                <select id="region-select"></select>
+              </div>
+
+              <div class="scenario-pills" id="scenario-pills">
+                <button class="pill active" data-scn="ssp126">SSP1-2.6</button>
+                <button class="pill active" data-scn="ssp245">SSP2-4.5</button>
+                <button class="pill active" data-scn="ssp370">SSP3-7.0</button>
+                <button class="pill active" data-scn="ssp585">SSP5-8.5</button>
+              </div>
+            </div>
+            <p class="control-help">
+              Use the map or dropdown to choose a region. Use the buttons to toggle which scenarios are visible.
+              When you scroll or click the story cards on the left, the explorer will briefly focus on one pathway
+              to guide your attention.
+            </p>
+          </section>
+
+          <!-- Temperature Viz -->
+          <section id="viz-temp" class="viz-section">
+            <h2>Projected Temperature Change</h2>
+            <p>
+              This chart shows projected near-surface air temperature (°C) for the selected scenario(s) and region
+              from 1850 to 2100 (where available). Higher-emissions scenarios typically lead to steeper warming.
+            </p>
+            <div class="chart-header">
+              <div id="temp-chart-legend" class="legend"></div>
+            </div>
+            <div id="temp-chart" class="chart-container"></div>
+          </section>
+
+          <!-- Precip Viz -->
+          <section id="viz-precip" class="viz-section">
+            <h2>Projected Precipitation Change</h2>
+            <p>
+              This chart shows projected daily precipitation (mm/day) for the same scenario(s) and region.
+              Shifts in rainfall patterns can contribute to vegetation greening, browning, or biome shifts.
+            </p>
+            <div class="chart-header">
+              <div id="precip-chart-legend" class="legend"></div>
+            </div>
+            <div id="precip-chart" class="chart-container"></div>
+          </section>
+
+          <!-- Planned narrative / future structure -->
+          <section id="narrative">
+            <h2>Planned Narrative Structure</h2>
+            <p>
+              In the final project, we will extend this prototype into a full explorable explanation that:
+            </p>
+            <ul>
+              <li>Introduces global temperature trajectories across CMIP6 emission pathways.</li>
+              <li>Highlights regional contrasts in temperature and precipitation change.</li>
+              <li>Connects climate projections to potential vegetation responses and biome transitions.</li>
+              <li>Communicates uncertainty using model spreads and simple visual encodings.</li>
+            </ul>
+          </section>
+
+        </div>
+      </section>
     </section>
 
-    <!-- SCROLLYTELLING SECTION: story on left, controls+charts on right -->
-    <section id="scrolly-1">
-      <!-- Story / narrative column -->
-      <div id="scrolly-text">
-        <h2>How Different Climate Futures Diverge</h2>
-        <p class="scrolly-intro">
-          Scroll through the story beats below. Each step highlights a different CMIP6 emissions
-          pathway. As you move down the page, the visualizations on the right will focus on that
-          scenario, while the region dropdown lets you see how the same pathway plays out in
-          different parts of the world.
+    <!-- ================== WRITE-UP TAB ================== -->
+    <section id="writeup" class="tab-panel">
+      <section class="writeup-inner">
+        <h2>Project Write-Up</h2>
+
+        <h3>1. What have you done so far?</h3>
+        <p>
+          So far, we have built the core structure of the Climate Futures Explorer prototype, including
+          the user interface, dropdown controls, world map, and two main D3 time-series visualizations.
+          We have connected the charts to scenario and region selectors so that the user can dynamically
+          explore differences in future climate projections. We also integrated processed temperature
+          and precipitation datasets from the CMIP6 archive and ensured they load efficiently through
+          JavaScript. Additionally, we created a cohesive design system with consistent styling,
+          card components, and a dark background theme to increase readability and focus.
+        </p>
+        <p>
+          Beyond the visuals, we have outlined the narrative flow that the final project will follow,
+          including how temperature trends, precipitation shifts, and ecological responses will be
+          introduced in a step-by-step story. The scrollytelling structure on the Explorer tab highlights
+          one scenario at a time while keeping regional exploration available. Overall, the prototype now
+          includes all foundational elements needed for the explorable explanation we plan to build.
+        </p>
+        <p>
+          We have also begun experimenting with alternative visualization ideas, including preliminary 
+          map mockups and concept sketches for a linked-view interface that connects spatial patterns to 
+          the time-series trends already implemented. This early design exploration helps us evaluate which 
+          visual forms best support the story we want to tell and where future improvements should be targeted. 
+          In parallel, we organized our data-processing workflow so new CMIP6 variables or vegetation indicators 
+          can be incorporated seamlessly later. By establishing a flexible codebase and clear visual direction 
+          at this stage, we are preparing the foundation needed to scale the project into a richer explorable 
+          explanation.
         </p>
 
-        <div class="step" data-scenario="ssp126">
-          <h3>SSP1-2.6 – Rapid mitigation</h3>
-          <p>
-            In a world that aggressively cuts emissions, global temperature still rises,
-            but the curve stays relatively shallow. Precipitation changes are present,
-            yet less extreme, giving ecosystems more time to adapt before major biome
-            shifts are locked in.
-          </p>
-        </div>
-
-        <div class="step" data-scenario="ssp245">
-          <h3>SSP2-4.5 – “Middle-of-the-road” pathway</h3>
-          <p>
-            This pathway is close to our current trajectory. Warming accelerates after
-            mid-century, and precipitation shifts become more noticeable—more intense
-            rainfall in some regions and drying in others—raising pressure on crops,
-            forests, and water systems.
-          </p>
-        </div>
-
-        <div class="step" data-scenario="ssp370">
-          <h3>SSP3-7.0 – High emissions, uneven action</h3>
-          <p>
-            In this scenario, global cooperation stalls. Temperatures climb much more
-            steeply, and rainfall patterns become more volatile. Some regions face
-            repeated droughts while others see heavier downpours, increasing the risk
-            of vegetation stress and biome disruption.
-          </p>
-        </div>
-
-        <div class="step" data-scenario="ssp585">
-          <h3>SSP5-8.5 – Fossil-fuel intensive future</h3>
-          <p>
-            This fossil-fuel heavy world leads to the fastest warming and the largest
-            shifts in precipitation. It represents a “worst-case” benchmark where
-            ecosystems have the least time to adapt, and the likelihood of large-scale
-            biome transitions is highest.
-          </p>
-        </div>
-      </div>
-
-      <!-- Visualization column: controls + charts -->
-      <div id="scrolly-viz">
-
-        <!-- Controls -->
-        <section id="controls">
-          <h2>Explore Scenarios and Regions</h2>
-          <div class="control-row">
-            <!-- Scenario select is unused but kept for structure if needed later
-            <div class="control-group">
-              <label for="scenario-select">Scenario:</label>
-              <select id="scenario-select"></select>
-            </div> -->
-
-            <div class="control-group">
-              <label for="region-select">Region:</label>
-              <select id="region-select"></select>
-            </div>
-
-            <div class="scenario-pills" id="scenario-pills">
-              <button class="pill active" data-scn="ssp126">SSP1-2.6</button>
-              <button class="pill active" data-scn="ssp245">SSP2-4.5</button>
-              <button class="pill active" data-scn="ssp370">SSP3-7.0</button>
-              <button class="pill active" data-scn="ssp585">SSP5-8.5</button>
-            </div>
-          </div>
-          <p class="control-help">
-            Use the dropdown to choose a world region. Use the buttons to select which scenario(s).
-            Both charts below will update to reflect your selection. The narrative on the left
-            highlights one scenario at a time to guide your attention.
-          </p>
-        </section>
-
-        <!-- Temperature Viz -->
-        <section id="viz-temp" class="viz-section">
-          <h2>Projected Temperature Change</h2>
-          <p>
-            This chart shows projected near-surface air temperature (°C) for the selected scenario
-            and region from 1850 to 2100 (where available). Higher-emissions scenarios typically
-            lead to steeper warming.
-          </p>
-          <div class="chart-header">
-            <div id="temp-chart-legend" class="legend"></div>
-          </div>
-          <div id="temp-chart" class="chart-container"></div>
-        </section>
-
-        <!-- Precip Viz -->
-        <section id="viz-precip" class="viz-section">
-          <h2>Projected Precipitation Change</h2>
-          <p>
-            This chart shows projected daily precipitation (mm/day) for the same scenario and region.
-            Changes in rainfall patterns can contribute to vegetation greening, browning, or biome shifts.
-          </p>
-          <div class="chart-header">
-            <div id="precip-chart-legend" class="legend"></div>
-          </div>
-          <div id="precip-chart" class="chart-container"></div>
-        </section>
-
-      </div>
-    </section>
-
-    <!-- Future Narrative Placeholder -->
-    <section id="narrative">
-      <h2>Planned Narrative Structure</h2>
-      <p>
-        In the final project, we will extend this prototype into a full explorable explanation that:
-      </p>
-      <ul>
-        <li>Introduces global temperature trajectories across CMIP6 emission pathways.</li>
-        <li>Highlights regional contrasts in temperature and precipitation change.</li>
-        <li>Connects climate projections to potential vegetation responses and biome transitions.</li>
-      </ul>
+        <h3>2. What will be the most challenging part of the project and why?</h3>
+        <p>
+          The most challenging part of the project will be designing an integrated narrative that
+          smoothly connects the climate variables to ecological outcomes while keeping the interface
+          intuitive and uncluttered. Climate data is inherently complex, and adding meaningful
+          explanations without overwhelming users requires careful information design. Another major
+          difficulty will be integrating spatial data, such as maps or vegetation classifications,
+          into the existing time-series framework. Ensuring that the visual transitions feel coherent
+          and that users understand how each chart relates to the evolving story will take significant
+          iteration.
+        </p>
+        <p>
+          We also anticipate challenges in balancing interactivity with interpretability. As we add
+          more layers—scenarios, regions, biome indicators, and narrative steps—it becomes harder to
+          maintain visual clarity and avoid cognitive overload. Developing a layout that supports
+          multiple linked views while remaining visually clean will require thoughtful prototyping
+          and user-first design decisions. Ultimately, the biggest challenge is not technical, but
+          ensuring the final narrative remains compelling, accessible, and scientifically accurate.
+        </p>
+        <p>
+          Another possible challenge will be communicating uncertainty responsibly without overwhelming 
+          users with technical details. CMIP6 models contain variability across institutions, scenarios, 
+          and ensemble members, and presenting this uncertainty transparently, whether through error bands, 
+          model spreads, or qualitative explanations, requires careful judgment. We want viewers to understand 
+          both the robustness of long-term climate trends and the nuance in regional projections. Finding the 
+          right level of detail and the right visual encodings to convey uncertainty will be essential to 
+          maintaining scientific accuracy while still providing a smooth, engaging user experience.
+        </p>
+      </section>
     </section>
 
   </main>
 
   <footer>
-    <p>Prototype v0.1 – DSC 106 Fall 2025</p>
+    <p>Prototype v0.2 – DSC 106 Fall 2025</p>
   </footer>
 
   <script src="script.js"></script>

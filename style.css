@@ -8,26 +8,43 @@ body {
   margin: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.6;
-  color: #0f172a;
+  color: #e5e7eb;
   background: #0f172a;
+}
+
+/* Scenario mood backgrounds */
+body.scn-ssp126 {
+  background: radial-gradient(circle at top, #0f172a 0%, #020617 55%, #020617 100%);
+}
+
+body.scn-ssp245 {
+  background: radial-gradient(circle at top, #111827 0%, #020617 60%, #020617 100%);
+}
+
+body.scn-ssp370 {
+  background: radial-gradient(circle at top, #1f2937 0%, #020617 65%, #020617 100%);
+}
+
+body.scn-ssp585 {
+  background: radial-gradient(circle at top, #7f1d1d 0%, #020617 60%, #020617 100%);
 }
 
 /* ---------- Shell ---------- */
 
 header,
 footer {
-  background: #020617;
+  background: transparent;
   color: #e5e7eb;
   padding: 1rem 1.5rem;
 }
 
 header {
-  border-bottom: 1px solid #1f2937;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 header h1 {
   margin: 0;
-  font-size: 1.6rem;
+  font-size: 1.7rem;
   letter-spacing: 0.03em;
 }
 
@@ -40,13 +57,13 @@ header p {
 footer {
   text-align: center;
   font-size: 0.8rem;
-  border-top: 1px solid #1f2937;
+  border-top: 1px solid rgba(148, 163, 184, 0.2);
 }
 
 main {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 1.75rem auto 2.5rem auto;
-  padding: 0 1.25rem;
+  padding: 0 1.25rem 2rem;
 }
 
 /* ---------- Sections ---------- */
@@ -57,10 +74,11 @@ section {
   border-radius: 0.9rem;
   padding: 1.1rem 1.3rem 1.3rem 1.3rem;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.2);
+  color: #0f172a;
 }
 
-section#intro {
+#intro {
   background: linear-gradient(135deg, #eff6ff, #f9fafb);
 }
 
@@ -82,6 +100,50 @@ section ul {
   padding: 0;
   font-size: 0.95rem;
   color: #4b5563;
+}
+
+/* ---------- Tabs ---------- */
+
+#tab-bar {
+  display: flex;
+  gap: 0.6rem;
+  margin: 1.2rem 0 0.8rem;
+}
+
+.tab-btn {
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #1f2937;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.tab-btn:hover {
+  background: #0b1120;
+}
+
+.tab-btn.active {
+  background: #22c55e;
+  color: #022c22;
+  box-shadow: 0 8px 24px rgba(34, 197, 94, 0.35);
+  transform: translateY(-1px);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+/* Slightly different style for write-up block */
+.writeup-inner {
+  background: #f9fafb;
+  border-radius: 0.9rem;
 }
 
 /* ---------- Controls ---------- */
@@ -156,19 +218,19 @@ select {
   color: #fff;
 }
 
+/* ---------- Legends / charts ---------- */
+
 .chart-header {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 6px;
-  margin-top: 0; /* no negative margin -> no overlap */
+  margin-top: 0;
 }
 
 .legend {
   display: flex;
-  top: 10px;
-  right: 10px;
   flex-direction: column;
-  background-color: rgba(255, 255, 255, 0.85);
+  background-color: rgba(255, 255, 255, 0.9);
   padding: 6px 10px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
@@ -242,6 +304,15 @@ select {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
+  background: transparent;
+  border-radius: 0.9rem;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+#explorer > #scrolly-1 {
+  background: transparent;
 }
 
 #scrolly-text {
@@ -252,7 +323,7 @@ select {
 #scrolly-viz {
   flex: 1;
   position: sticky;
-  top: 80px; /* adjust if header height changes */
+  top: 80px;
 }
 
 .scrolly-intro {
@@ -262,7 +333,6 @@ select {
   max-width: 36rem;
 }
 
-/* Narrative steps on the left */
 #scrolly-text .step {
   margin-top: 1rem;
   padding: 1rem 1.1rem;
@@ -270,8 +340,12 @@ select {
   background: #020617;
   border: 1px solid #1f2937;
   color: #e5e7eb;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease,
-              background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+  cursor: pointer;
 }
 
 #scrolly-text .step h3 {
@@ -287,31 +361,50 @@ select {
   font-size: 0.9rem;
 }
 
-/* Active step highlight when it's in focus */
 #scrolly-text .step.is-active {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5),
-              0 10px 30px rgba(15, 23, 42, 0.45);
-  background: #020617;
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.6),
+    0 10px 30px rgba(15, 23, 42, 0.55);
   transform: translateY(-2px);
+}
+
+/* ---------- Map ---------- */
+
+.map-container {
+  margin-top: 0.3rem;
+  background: radial-gradient(circle at top, #020617 0%, #020617 40%, #020617 100%);
+  border-radius: 0.9rem;
+  border: 1px solid #1f2937;
+  padding: 0.4rem;
+  max-width: 460px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.map-container svg {
+  display: block;
+}
+
+.region-dot {
+  fill: #38bdf8;
+  stroke: #0f172a;
+  stroke-width: 1.2;
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+.region-dot:hover {
+  opacity: 1;
+}
+
+.region-dot.active-region {
+  fill: #f97316;
 }
 
 /* ---------- Responsive ---------- */
 
-@media (max-width: 768px) {
-  main {
-    padding: 0 0.75rem;
-  }
-
-  section {
-    padding: 0.9rem 0.9rem 1.1rem 0.9rem;
-  }
-
-  header h1 {
-    font-size: 1.4rem;
-  }
-
-  /* Stack scrolly columns and disable sticky on small screens */
+@media (max-width: 900px) {
   #scrolly-1 {
     flex-direction: column;
   }
@@ -322,6 +415,29 @@ select {
   }
 
   #scrolly-text {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  main {
+    padding: 0 0.75rem 1.5rem;
+  }
+
+  section {
+    padding: 0.9rem 0.9rem 1.1rem 0.9rem;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+  }
+
+  .control-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .map-container {
     max-width: 100%;
   }
 }

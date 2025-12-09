@@ -1,10 +1,8 @@
-// ------------------------------------------------------------
-// Global variables
-// ------------------------------------------------------------
+// ============================================================
+// GLOBAL STATE
+// ============================================================
 let tempDataRaw = [];
 let precipDataRaw = [];
-let tempGlobalMin, tempGlobalMax;
-let precipGlobalMin, precipGlobalMax;
 
 const tempFixedY = [4, 30];
 const precipFixedY = [1.6, 4];
@@ -13,36 +11,31 @@ let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"];
 
 // Scenario pills
 const pills = document.querySelectorAll(".pill");
-pills.forEach(pill => {
-  pill.addEventListener("click", () => {
-    const scenario = pill.dataset.scn;
 
-    // Toggle pill
-    pill.classList.toggle("active");
+// Tabs
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabPanels = document.querySelectorAll(".tab-panel");
 
-    // Update selected scenarios
-    showScenarios = Array.from(pills)
-      .filter(p => p.classList.contains("active"))
-      .map(p => p.dataset.scn);
-
-    updateCharts();
-  });
-});
-
-// Date parser
-const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
-
-// Chart dimensions
+// Chart config
 const chartConfig = {
   width: 720,
   height: 320,
   margin: { top: 40, right: 20, bottom: 50, left: 70 }
 };
 
-// Tooltip
+// Map config
+const mapConfig = {
+  width: 440,
+  height: 260
+};
+
+// Tooltip for charts
 const tooltip = d3.select("body")
   .append("div")
   .attr("class", "tooltip");
+
+// Date parser for CSV timestamps
+const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
 
 // Scenario label helper
 function scenarioLabel(key) {
@@ -55,9 +48,18 @@ function scenarioLabel(key) {
   return labels[key] || key;
 }
 
-// ------------------------------------------------------------
-// Load temperature + precipitation data
-// ------------------------------------------------------------
+// Mood background based on scenario
+function setScenarioMood(scenario) {
+  const body = document.body;
+  body.classList.remove("scn-ssp126", "scn-ssp245", "scn-ssp370", "scn-ssp585");
+  if (scenario) {
+    body.classList.add("scn-" + scenario);
+  }
+}
+
+// ============================================================
+// DATA LOADING
+// ============================================================
 Promise.all([
   d3.csv("temp_df.csv", d => ({
     time: parseTime(d.time),
@@ -77,34 +79,41 @@ Promise.all([
   tempDataRaw = temp;
   precipDataRaw = precip;
 
-  tempGlobalMin = d3.min(tempDataRaw, d => d.tas_C);
-  tempGlobalMax = d3.max(tempDataRaw, d => d.tas_C);
-  precipGlobalMin = d3.min(precipDataRaw, d => d.pr_day);
-  precipGlobalMax = d3.max(precipDataRaw, d => d.pr_day);
-
+  initializeTabs();
   initializeControls();
+  initializePills();
+  initializeScrolly();
+
+  drawRegionMap();
   updateCharts();
-  setupScrolly();
+
 }).catch(err => {
   console.error("Error loading CSVs:", err);
 });
 
-// ------------------------------------------------------------
-// Dropdown (region) initialization
-// ------------------------------------------------------------
+// ============================================================
+// TABS
+// ============================================================
+function initializeTabs() {
+  tabButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+
+      tabButtons.forEach(b => b.classList.remove("active"));
+      tabPanels.forEach(panel => panel.classList.remove("active"));
+
+      btn.classList.add("active");
+      document.getElementById(target).classList.add("active");
+    });
+  });
+}
+
+// ============================================================
+// CONTROLS (regions)
+// ============================================================
 function initializeControls() {
-  const scenarios = Array.from(new Set(tempDataRaw.map(d => d.scenario))).sort();
   const regions = Array.from(new Set(tempDataRaw.map(d => d.region))).sort();
-
-  const scenarioSelect = d3.select("#scenario-select");
   const regionSelect = d3.select("#region-select");
-
-  scenarioSelect
-    .selectAll("option")
-    .data(scenarios)
-    .join("option")
-    .attr("value", d => d)
-    .text(d => scenarioLabel(d));
 
   regionSelect
     .selectAll("option")
@@ -113,16 +122,37 @@ function initializeControls() {
     .attr("value", d => d)
     .text(d => d);
 
-  if (scenarios.includes("ssp245")) scenarioSelect.property("value", "ssp245");
-  if (regions.includes("Global")) regionSelect.property("value", "Global");
+  if (regions.includes("Global")) {
+    regionSelect.property("value", "Global");
+  }
 
-  scenarioSelect.on("change", updateCharts);
-  regionSelect.on("change", updateCharts);
+  regionSelect.on("change", () => {
+    const value = regionSelect.property("value");
+    highlightRegionDot(value);
+    updateCharts();
+  });
 }
 
-// ------------------------------------------------------------
-// Main update function for both charts
-// ------------------------------------------------------------
+// Scenario pills toggling
+function initializePills() {
+  pills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      const scenario = pill.dataset.scn;
+
+      pill.classList.toggle("active");
+
+      showScenarios = Array.from(pills)
+        .filter(p => p.classList.contains("active"))
+        .map(p => p.dataset.scn);
+
+      updateCharts();
+    });
+  });
+}
+
+// ============================================================
+// MAIN UPDATE FUNCTION FOR BOTH CHARTS
+// ============================================================
 function updateCharts() {
   const region = d3.select("#region-select").property("value");
 
@@ -155,16 +185,15 @@ function updateCharts() {
   });
 }
 
-// ------------------------------------------------------------
-// Draw line chart (supports 1 or many scenarios)
-// ------------------------------------------------------------
+// ============================================================
+// LINE CHARTS
+// ============================================================
 function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain, showAllScenarios }) {
-
   const containerSel = d3.select(container);
   containerSel.selectAll("*").remove();
 
   const legendDiv = d3.select(container + "-legend");
-  if (!legendDiv.empty()) legendDiv.selectAll("*").remove();   // Always clear legend
+  legendDiv.selectAll("*").remove();
 
   const { width, height, margin } = chartConfig;
 
@@ -192,10 +221,12 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
 
   // Axes
   svg.append("g")
+    .attr("class", "axis x-axis")
     .attr("transform", `translate(0,${height - margin.bottom})`)
     .call(d3.axisBottom(xScale).ticks(6).tickFormat(d3.timeFormat("%Y")));
 
   svg.append("g")
+    .attr("class", "axis y-axis")
     .attr("transform", `translate(${margin.left},0)`)
     .call(d3.axisLeft(yScale).ticks(5));
 
@@ -226,26 +257,35 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     .y(d => yScale(yAccessor(d)));
 
   if (showAllScenarios) {
-
+    // Group by scenario
     const nested = d3.group(data, d => d.scenario);
     const color = d3.scaleOrdinal(d3.schemeCategory10)
       .domain(Array.from(nested.keys()));
 
-    // Make legend
+    // Legend
     Array.from(nested.keys()).forEach(key => {
       const item = legendDiv.append("div").attr("class", "legend-item");
       item.append("div").style("background-color", color(key));
       item.append("span").text(scenarioLabel(key));
     });
 
-    // Multi-lines
     nested.forEach((values, key) => {
-      svg.append("path")
+      // Animated path
+      const path = svg.append("path")
         .datum(values)
         .attr("fill", "none")
         .attr("stroke", color(key))
         .attr("stroke-width", 2)
         .attr("d", line);
+
+      const totalLength = path.node().getTotalLength();
+      path
+        .attr("stroke-dasharray", totalLength + " " + totalLength)
+        .attr("stroke-dashoffset", totalLength)
+        .transition()
+        .duration(900)
+        .ease(d3.easeCubic)
+        .attr("stroke-dashoffset", 0);
 
       svg.selectAll(".point-" + key)
         .data(values)
@@ -273,14 +313,22 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     });
 
   } else {
-
-    // Single scenario mode
-    svg.append("path")
+    // Single scenario view
+    const path = svg.append("path")
       .datum(data)
       .attr("fill", "none")
       .attr("stroke", "#3b82f6")
       .attr("stroke-width", 2)
       .attr("d", line);
+
+    const totalLength = path.node().getTotalLength();
+    path
+      .attr("stroke-dasharray", totalLength + " " + totalLength)
+      .attr("stroke-dashoffset", totalLength)
+      .transition()
+      .duration(900)
+      .ease(d3.easeCubic)
+      .attr("stroke-dashoffset", 0);
 
     svg.selectAll(".point")
       .data(data)
@@ -307,17 +355,104 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
   }
 }
 
-// ------------------------------------------------------------
-// SCROLLYTELLING: sync story steps → active scenario
-// ------------------------------------------------------------
-function setupScrolly() {
+// ============================================================
+// WORLD MAP + REGION MARKERS
+// ============================================================
+function drawRegionMap() {
+  const container = d3.select("#region-map");
+  container.selectAll("*").remove();
+
+  const { width, height } = mapConfig;
+
+  const svg = container.append("svg")
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
+
+  d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
+    .then(world => {
+      const countries = topojson.feature(world, world.objects.countries);
+
+      const projection = d3.geoNaturalEarth1()
+        .fitSize([width, height], countries);
+
+      const path = d3.geoPath(projection);
+
+      // Ocean / sphere
+      svg.append("path")
+        .datum({ type: "Sphere" })
+        .attr("d", path)
+        .attr("fill", "#020617")
+        .attr("stroke", "#0b1220")
+        .attr("stroke-width", 0.5);
+
+      // Land
+      svg.append("g")
+        .selectAll("path")
+        .data(countries.features)
+        .join("path")
+        .attr("d", path)
+        .attr("fill", "#020617")
+        .attr("stroke", "#1f2937")
+        .attr("stroke-width", 0.4)
+        .attr("opacity", 0.9);
+
+      // Available regions in the data
+      const regionsAvailable = new Set(tempDataRaw.map(d => d.region));
+
+      const markersAll = [
+        { name: "Global", lon: 0, lat: 0 },
+        { name: "North America", lon: -100, lat: 40 },
+        { name: "South America", lon: -60, lat: -15 },
+        { name: "Europe", lon: 10, lat: 50 },
+        { name: "Africa", lon: 20, lat: 5 },
+        { name: "Asia", lon: 90, lat: 30 },
+        { name: "Oceania", lon: 135, lat: -25 },
+        { name: "Arctic", lon: 0, lat: 75 }
+      ];
+
+      const markers = markersAll.filter(m => regionsAvailable.has(m.name));
+
+      const dots = svg.append("g")
+        .attr("class", "region-dots")
+        .selectAll("circle")
+        .data(markers, d => d.name)
+        .join("circle")
+        .attr("class", "region-dot")
+        .attr("cx", d => projection([d.lon, d.lat])[0])
+        .attr("cy", d => projection([d.lon, d.lat])[1])
+        .attr("r", 5)
+        .on("click", (event, d) => {
+          d3.select("#region-select").property("value", d.name);
+          highlightRegionDot(d.name);
+          updateCharts();
+        });
+
+      dots.append("title").text(d => d.name);
+
+      // Initial highlight based on current dropdown
+      const currentRegion = d3.select("#region-select").property("value");
+      highlightRegionDot(currentRegion);
+    });
+}
+
+function highlightRegionDot(regionName) {
+  d3.selectAll(".region-dot")
+    .classed("active-region", d => d.name === regionName);
+}
+
+// ============================================================
+// SCROLLYTELLING (Scrollama + click on steps)
+// ============================================================
+function initializeScrolly() {
   if (typeof scrollama === "undefined") {
     console.warn("Scrollama missing.");
     return;
   }
 
-  const scroller = scrollama();
+  const steps = document.querySelectorAll("#scrolly-text .step");
 
+  // Scrollama
+  const scroller = scrollama();
   scroller
     .setup({
       container: "#scrolly-1",
@@ -325,42 +460,45 @@ function setupScrolly() {
       offset: 0.55
     })
     .onStepEnter((response) => {
+      const el = response.element;
+      const scenario = el.dataset.scenario;
 
       d3.selectAll("#scrolly-1 .step").classed("is-active", false);
-      d3.select(response.element).classed("is-active", true);
+      d3.select(el).classed("is-active", true);
 
-      const scenario = response.element.dataset.scenario;
-      if (!scenario) return;
+      setScenarioMood(scenario);
 
-      // Sync pills
+      // Focus on one scenario when step is active
       pills.forEach(p => {
         if (p.dataset.scn === scenario) p.classList.add("active");
         else p.classList.remove("active");
       });
-
-      showScenarios = [scenario];  // focus on narrative scenario
+      showScenarios = [scenario];
       updateCharts();
     });
 
   window.addEventListener("resize", scroller.resize);
 
-  // Also allow clicking on story steps to jump scenarios
-  const stepEls = document.querySelectorAll("#scrolly-text .step");
-  stepEls.forEach(step => {
+  // Also allow clicking on a step
+  steps.forEach(step => {
     step.addEventListener("click", () => {
       const scenario = step.dataset.scenario;
-      if (!scenario) return;
 
       d3.selectAll("#scrolly-1 .step").classed("is-active", false);
       d3.select(step).classed("is-active", true);
+
+      setScenarioMood(scenario);
 
       pills.forEach(p => {
         if (p.dataset.scn === scenario) p.classList.add("active");
         else p.classList.remove("active");
       });
-
       showScenarios = [scenario];
       updateCharts();
     });
   });
+
+  // Initial mood
+  const firstScenario = steps[0]?.dataset.scenario;
+  if (firstScenario) setScenarioMood(firstScenario);
 }
