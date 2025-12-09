@@ -119,11 +119,78 @@
     color: #0f172a;
   }
   
-  .control-help {
+.control-help {
     font-size: 0.8rem;
     color: #64748b;
     margin-top: 0.6rem;
   }
+
+.scenario-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.pill {
+  padding: 4px 12px;       /* smaller padding */
+  border-radius: 16px;     /* slightly smaller pill shape */
+  border: 2px solid #90a4ae;
+  background-color: #f0f4f8;
+  color: #607d8b;
+  font-size: 0.75rem;      /* smaller text */
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08); /* lighter shadow */
+}
+
+.pill:hover {
+  background-color: #607d8b;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.pill.active {
+  background-color: #607d8b;
+  color: #fff;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: flex-end; /* moves legend to top-right */
+  margin-bottom: 6px;       /* space between legend and chart */
+  margin-top: -90px;
+}
+
+.legend {
+  display: flex;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(255, 255, 255, 0.85); /* optional: semi-transparent bg */
+  padding: 6px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  font-size: 0.75rem;
+  color: #1e293b;
+  z-index: 10;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.legend-item div {
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 2px;
+}
+
   
   /* ---------- Charts ---------- */
   

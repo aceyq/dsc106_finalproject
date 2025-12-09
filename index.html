@@ -96,15 +96,23 @@
     <section id="controls">
       <h2>Explore Scenarios and Regions</h2>
       <div class="control-row">
-        <div class="control-group">
+        <!-- <div class="control-group">
           <label for="scenario-select">Scenario:</label>
           <select id="scenario-select"></select>
-        </div>
+        </div> -->
 
         <div class="control-group">
           <label for="region-select">Region:</label>
           <select id="region-select"></select>
         </div>
+
+        <div class="scenario-pills" id="scenario-pills">
+          <button class="pill active" data-scn="ssp126">SSP1-2.6</button>
+          <button class="pill active" data-scn="ssp245">SSP2-4.5</button>
+          <button class="pill active" data-scn="ssp370">SSP3-7.0</button>
+          <button class="pill active" data-scn="ssp585">SSP5-8.5</button>
+        </div>
+        <!-- <div id="temp-chart-legend" class="legend"></div> -->
       </div>
       <p class="control-help">
         Use the dropdowns to choose a CMIP6 scenario and world region. Both charts below will
@@ -120,6 +128,10 @@
         and region from 1850 to 2100 (where available). Higher-emissions scenarios typically
         lead to steeper warming.
       </p>
+      <!-- <div id="temp-chart" class="chart-container"></div> -->
+      <div class="chart-header">
+        <div id="temp-chart-legend" class="legend"></div>
+      </div>
       <div id="temp-chart" class="chart-container"></div>
     </section>
 
@@ -130,6 +142,10 @@
         This chart shows projected daily precipitation (mm/day) for the same scenario and region.
         Changes in rainfall patterns can contribute to vegetation greening, browning, or biome shifts.
       </p>
+      <!-- <div id="precip-chart" class="chart-container"></div> -->
+      <div class="chart-header">
+        <div id="precip-chart-legend" class="legend"></div>
+      </div>
       <div id="precip-chart" class="chart-container"></div>
     </section>
 

@@ -5,7 +5,27 @@ let tempGlobalMin, tempGlobalMax;
 let precipGlobalMin, precipGlobalMax;
 
 const tempFixedY = [4, 30]; // adjust based on your data
-const precipFixedY = [1.8, 4]; // adjust to your max values
+const precipFixedY = [1.6, 4]; // adjust to your max values
+
+let showScenarios = ["ssp126", "ssp245", "ssp370", "ssp585"]; // default all
+const pills = document.querySelectorAll(".pill");
+
+pills.forEach(pill => {
+  pill.addEventListener("click", () => {
+    const scenario = pill.dataset.scn;
+
+    // toggle active class
+    pill.classList.toggle("active");
+
+    // update array of selected scenarios
+    showScenarios = Array.from(pills)
+      .filter(p => p.classList.contains("active"))
+      .map(p => p.dataset.scn);
+
+    // update charts
+    updateCharts();
+  });
+});
 
 // Date parser for "YYYY-MM-DD HH:MM:SS"
 const parseTime = d3.timeParse("%Y-%m-%d %H:%M:%S");
@@ -106,15 +126,15 @@ function initializeControls() {
 
 // Filter data and redraw both charts
 function updateCharts() {
-  const scenario = d3.select("#scenario-select").property("value");
   const region = d3.select("#region-select").property("value");
 
+  // filter data by active scenarios and selected region
   const tempFiltered = tempDataRaw
-    .filter(d => d.scenario === scenario && d.region === region)
+    .filter(d => showScenarios.includes(d.scenario) && d.region === region)
     .sort((a, b) => d3.ascending(a.time, b.time));
 
   const precipFiltered = precipDataRaw
-    .filter(d => d.scenario === scenario && d.region === region)
+    .filter(d => showScenarios.includes(d.scenario) && d.region === region)
     .sort((a, b) => d3.ascending(a.time, b.time));
 
   drawLineChart({
@@ -122,8 +142,9 @@ function updateCharts() {
     data: tempFiltered,
     yAccessor: d => d.tas_C,
     yLabel: "Temperature (°C)",
-    title: `Temperature – ${scenarioLabel(scenario)}, ${region}`,
-    fixedYDomain: tempFixedY
+    title: `Temperature – ${region}`,
+    fixedYDomain: tempFixedY,
+    showAllScenarios: showScenarios.length > 1
   });
 
   drawLineChart({
@@ -131,21 +152,19 @@ function updateCharts() {
     data: precipFiltered,
     yAccessor: d => d.pr_day,
     yLabel: "Precipitation (mm/day)",
-    title: `Precipitation – ${scenarioLabel(scenario)}, ${region}`,
-    fixedYDomain: precipFixedY
+    title: `Precipitation – ${region}`,
+    fixedYDomain: precipFixedY,
+    showAllScenarios: showScenarios.length > 1
   });
 }
 
-// Generic line chart drawing function using D3
-function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain}) {
-  // Clear any existing SVG
+// // Generic line chart drawing function using D3
+function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain, showAllScenarios }) {
   const containerSel = d3.select(container);
   containerSel.selectAll("*").remove();
 
   const { width, height, margin } = chartConfig;
-
-  const svg = containerSel
-    .append("svg")
+  const svg = containerSel.append("svg")
     .attr("viewBox", `0 0 ${width} ${height}`)
     .attr("preserveAspectRatio", "xMidYMid meet");
 
@@ -159,53 +178,22 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     return;
   }
 
-  // Scales
-  const xExtent = d3.extent(data, d => d.time);
-  // const yExtent = d3.extent(data, yAccessor);
-
   const xScale = d3.scaleTime()
-    .domain(xExtent)
+    .domain(d3.extent(data, d => d.time))
     .range([margin.left, width - margin.right]);
 
-  //const yPadding = (yExtent[1] - yExtent[0]) * 0.1 || 1;
-  // const yScale = d3.scaleLinear()
-    //.domain([yExtent[0] - yPadding, yExtent[1] + yPadding])
-    //.nice()
-    //.range([height - margin.bottom, margin.top]);
-
-  let yMin, yMax;
-
-  if (fixedYDomain) {
-    // Use global range
-    yMin = fixedYDomain[0];
-    yMax = fixedYDomain[1];
-  } else {
-    // fallback (should not happen for your project)
-    const yExtent = d3.extent(data, yAccessor);
-    yMin = yExtent[0];
-    yMax = yExtent[1];
-  }
   const yScale = d3.scaleLinear()
-    .domain([yMin, yMax])
+    .domain(fixedYDomain)
     .range([height - margin.bottom, margin.top]);
 
   // Axes
-  const xAxis = d3.axisBottom(xScale)
-    .ticks(6)
-    .tickFormat(d3.timeFormat("%Y"));
-
-  const yAxis = d3.axisLeft(yScale)
-    .ticks(5);
+  svg.append("g")
+    .attr("transform", `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(xScale).ticks(6).tickFormat(d3.timeFormat("%Y")));
 
   svg.append("g")
-    .attr("class", "axis x-axis")
-    .attr("transform", `translate(0, ${height - margin.bottom})`)
-    .call(xAxis);
-
-  svg.append("g")
-    .attr("class", "axis y-axis")
-    .attr("transform", `translate(${margin.left}, 0)`)
-    .call(yAxis);
+    .attr("transform", `translate(${margin.left},0)`)
+    .call(d3.axisLeft(yScale).ticks(5));
 
   // Axis labels
   svg.append("text")
@@ -231,46 +219,94 @@ function drawLineChart({ container, data, yAccessor, yLabel, title, fixedYDomain
     .attr("font-weight", "600")
     .text(title);
 
-  // Line generator
   const line = d3.line()
     .x(d => xScale(d.time))
     .y(d => yScale(yAccessor(d)));
 
-  // Line path
-  svg.append("path")
-    .datum(data)
-    .attr("fill", "none")
-    .attr("stroke", "#3b82f6")
-    .attr("stroke-width", 2)
-    .attr("d", line);
-
-  // Points
-  svg.selectAll(".point")
-    .data(data)
-    .join("circle")
-    .attr("class", "point")
-    .attr("cx", d => xScale(d.time))
-    .attr("cy", d => yScale(yAccessor(d)))
-    .attr("r", 3)
-    .attr("fill", "#1d4ed8")
-    .on("mouseenter", (event, d) => {
-      const year = d.year;
-      const value = yAccessor(d).toFixed(2);
-      tooltip
-        .style("opacity", 1)
-        .html(`
-          <strong>Year:</strong> ${year}<br />
-          <strong>Value:</strong> ${value} ${yLabel.includes("Temperature") ? "°C" : "mm/day"}
-        `)
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY - 28) + "px");
-    })
-    .on("mousemove", (event) => {
-      tooltip
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY - 28) + "px");
-    })
-    .on("mouseleave", () => {
-      tooltip.style("opacity", 0);
+  if (showAllScenarios) {
+    const nested = d3.group(data, d => d.scenario);
+    const legendDiv = d3.select(container + "-legend");
+    legendDiv.selectAll("*").remove();
+    const color = d3.scaleOrdinal(d3.schemeCategory10)
+      .domain(Array.from(nested.keys()));
+    Array.from(nested.keys()).forEach(key => {
+      const item = legendDiv.append("div").attr("class", "legend-item");
+      item.append("div")
+          .style("background-color", color(key));
+      item.append("span")
+          .text(scenarioLabel(key));
     });
+
+    // Draw lines and points
+    nested.forEach((values, key) => {
+      svg.append("path")
+        .datum(values)
+        .attr("fill", "none")
+        .attr("stroke", color(key))
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+      svg.selectAll(".point-" + key)
+        .data(values)
+        .join("circle")
+        .attr("class", "point-" + key)
+        .attr("cx", d => xScale(d.time))
+        .attr("cy", d => yScale(yAccessor(d)))
+        .attr("r", 3)
+        .attr("fill", color(key))
+        .on("mouseenter", (event, d) => {
+          tooltip.style("opacity", 1)
+            .html(`<strong>Scenario:</strong> ${scenarioLabel(key)}<br/>
+                   <strong>Year:</strong> ${d.year}<br/>
+                   <strong>Value:</strong> ${yAccessor(d).toFixed(2)}`)
+            .style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mousemove", (event) => {
+          tooltip.style("left", (event.pageX + 10) + "px")
+            .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseleave", () => tooltip.style("opacity", 0));
+    });
+
+    // Legend
+    // const legend = svg.append("g")
+    //   .attr("transform", `translate(${width - margin.right - 150}, ${margin.top})`);
+
+    // Array.from(nested.keys()).forEach((key, i) => {
+    //   const g = legend.append("g").attr("transform", `translate(0, ${i * 20})`);
+    //   g.append("rect").attr("width", 12).attr("height", 12).attr("fill", color(key));
+    //   g.append("text").attr("x", 16).attr("y", 10).text(scenarioLabel(key)).attr("font-size", "0.75rem");
+    // });
+
+  } else {
+    // Single scenario
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "#3b82f6")
+      .attr("stroke-width", 2)
+      .attr("d", line);
+
+    svg.selectAll(".point")
+      .data(data)
+      .join("circle")
+      .attr("class", "point")
+      .attr("cx", d => xScale(d.time))
+      .attr("cy", d => yScale(yAccessor(d)))
+      .attr("r", 3)
+      .attr("fill", "#1d4ed8")
+      .on("mouseenter", (event, d) => {
+        tooltip.style("opacity", 1)
+          .html(`<strong>Year:</strong> ${d.year}<br/>
+                 <strong>Value:</strong> ${yAccessor(d).toFixed(2)}`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mousemove", (event) => {
+        tooltip.style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseleave", () => tooltip.style("opacity", 0));
+  }
 }
