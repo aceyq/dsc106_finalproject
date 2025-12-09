@@ -235,8 +235,8 @@ function startAutoplay() {
   playBtn.textContent = "Pause";
 
   const stepSize = 5;
-  const redrawBuffer = 700;
-  const renderBuffer = 5000;
+  const redrawBuffer = 400;
+  const renderBuffer = 2000;
 
   function advance() {
     // if autoplay was stopped while waiting, abort
